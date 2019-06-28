@@ -55,7 +55,7 @@ function productDisplay() {
             var responseStock = response[i].stock_quantity;
             if (responseStock === 0) {
                 stockQuantity = chalk.red(responseStock);
-            } else if (responseStock >= 1 && responseStock < 6) {
+            } else if (responseStock >= 1 && responseStock < 11) {
                 stockQuantity = chalk.yellow(responseStock);
             } else {
                 stockQuantity = chalk.green(responseStock);
@@ -103,6 +103,7 @@ function shopping() {
                         return chalkPipe("blue")(value);
                     }
                     //need to validate from numbers 1 to table length
+                    //and if it is a number
                 }, {
                     type: "number",
                     message: "How many would you like to purchase?",
