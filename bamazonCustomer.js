@@ -1,10 +1,13 @@
 //node packages
 var mysql = require("mysql");
 var inquirer = require("inquirer");
-// var Table = require("cli-table3");
 var chalkTable = require("chalk-table");
 var chalk = require("chalk");
+//global variables
+var stockQuantity;
+var rows = [];
 
+//set up a mysql connection
 var connection = mysql.createConnection({
     host: "localhost",
     port: 3306,
@@ -13,40 +16,42 @@ var connection = mysql.createConnection({
     database: "bamazon"
 })
 
+//connect to mysql
 connection.connect(function(error) {
     if (error) {
         console.log(error)
     }
+    //connection success message
+    // console.log("connected as id " + connection.threadId);
     productDisplay();
-    //console.log("yo");
-    //connection.end();
 })
 
 function productDisplay() {
-    console.log();
+    //display current database info in a table
     connection.query("SELECT * FROM products", function(error, response) {
         if (error) {
             console.log(error);
         }
-        console.log(chalk.cyan("Welcome") + " to " + chalk.yellow("Bamazon!"));
+        // console.log(chalk.cyan("Welcome") + " to " + chalk.yellow("Bamazon!"));
+        console.log("\nWelcome to Bamazon!");
         // console.log("Please check out our current products.");
-        var options = {
+        //table header
+        var headers = {
+            //table indent
             // leftPad: 2,
             columns: [
-              { field: "id",     name: chalk.yellow("ID") },
-              { field: "product",  name: chalk.yellow("Product") },
-              { field: "department", name: chalk.yellow("Department") },
-              { field: "price",  name: chalk.yellow("Price") },
-              { field: "stock",  name: chalk.yellow("Stock") }
+              { field: "id",     name: "ID" },
+              { field: "product",  name: "Product" },
+              { field: "department", name: "Department" },
+              { field: "price",  name: "Price" },
+              { field: "stock",  name: "Stock" }
             ]
         };
-        var stockQuantity;
-        var rows = [];
+        //loop through database items for specific values
         for (var i = 0; i < response.length; i++) {
-            // console.log(typeof(response[i].stock_quanity));
+            //change stock number color to red, yellow, or green according to
+            //whether the items have ran out, are low, or are high in quantity
             var responseStock = response[i].stock_quantity;
-            // stockQuanity.push(responseStock);
-            // console.log(stockQuanity);
             if (responseStock === 0) {
                 stockQuantity = chalk.red(responseStock);
             } else if (responseStock >= 1 && responseStock < 6) {
@@ -54,7 +59,7 @@ function productDisplay() {
             } else {
                 stockQuantity = chalk.green(responseStock);
             }
-            // console.log(typeof(stockQuantity));
+            //database items are pushed into an array to display on a table
             rows.push(
                 {
                     // id: chalk.blue(response[i].item_id),
@@ -62,12 +67,43 @@ function productDisplay() {
                     product: response[i].product_name,
                     department: response[i].department_name,
                     price: "$" + response[i].price,
-                    stock: stockQuantity}
+                    stock: stockQuantity
+                }
             );
-            var table = chalkTable(options, rows);
         }
-        console.log(table);
-        //(table.toString());
+        //create table using the headers and rows
+        var table = chalkTable(headers, rows);
+        //display table on the console
+        console.log(table + "\n");
         connection.end();
+        shopping();
+    })
+}
+
+function shopping() {
+    inquirer.prompt([
+        {
+            type: "confirm",
+            message: "Is there anything that catches your eye?",
+            name: "interest"
+        }
+    ]).then(function(response) {
+        if (response.interest) {
+            inquirer.prompt([
+                {
+                    type: "number",
+                    message: "What is the ID of the product you would like to purchase?",
+                    name: "id"
+                }, {
+                    type: "number",
+                    message: "How many would you like to purchase?",
+                    name: "quantity"
+                }
+            ]).then(function(response) {
+                console.log(response);
+            })
+        } else {
+            console.log("Please come again!");
+        }
     })
 }
