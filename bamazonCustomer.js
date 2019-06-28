@@ -24,6 +24,7 @@ connection.connect(function(error) {
     }
     //connection success message
     // console.log("connected as id " + connection.threadId);
+    console.log("\nWelcome to Bamazon!");
     productDisplay();
 })
 
@@ -34,7 +35,6 @@ function productDisplay() {
             console.log(error);
         }
         // console.log(chalk.cyan("Welcome") + " to " + chalk.yellow("Bamazon!"));
-        console.log("\nWelcome to Bamazon!");
         // console.log("Please check out our current products.");
         //table header
         var headers = {
@@ -48,6 +48,7 @@ function productDisplay() {
               { field: "stock",  name: "Stock" }
             ]
         };
+        rows = [];
         //loop through database items for specific values
         for (var i = 0; i < response.length; i++) {
             //change stock number color to red, yellow, or green according to
@@ -76,48 +77,53 @@ function productDisplay() {
         var table = chalkTable(headers, rows);
         //display table on the console
         console.log(table + "\n");
-        connection.end();
-        shopping();
+        purchasePrompt();
     })
 }
 
-//inquirer transformer only works on input and number
-function shopping() {
+function purchasePrompt() {
     inquirer.prompt([
         {
-            type: "confirm",
-            message: "Is there anything that catches your eye?",
-            name: "interest"
+            //when displaying initial table, get the table length and
+            //store in variable
+            type: "number",
+            message: "What is the ID of the product you would like to purchase?",
+            name: "id",
+            transformer: function(value) {
+                return chalkPipe("blue")(value);
+            }
+            //need to validate from numbers 1 to table length
+            //and if it is a number
+        }, {
+            type: "number",
+            message: "How many would you like to purchase?",
+            name: "quantity",
+            transformer: function(value) {
+                return chalkPipe("blue")(value);
+            }
         }
     ]).then(function(response) {
-        //if user is interested in a product, continue prompts
-        if (response.interest) {
-            inquirer.prompt([
-                {
-                    //when displaying initial table, get the table length and
-                    //store in variable
-                    type: "number",
-                    message: "What is the ID of the product you would like to purchase?",
-                    name: "id",
-                    transformer: function(value) {
-                        return chalkPipe("blue")(value);
-                    }
-                    //need to validate from numbers 1 to table length
-                    //and if it is a number
-                }, {
-                    type: "number",
-                    message: "How many would you like to purchase?",
-                    name: "quantity",
-                    transformer: function(value) {
-                        return chalkPipe("blue")(value);
-                    }
-                }
-            ]).then(function(response) {
-                console.log(response);
-            })
-        //if user not interested, end program
-        } else {
-            console.log("Please come again!");
+        purchaseProducts(response.id, response.quantity);
+        //console.log(chalk.green("\nSuccess: " + response.quantity + " items(s) were added to your cart!"));
+        //console.log(chalk.yellow("Your current total is: $10."));
+    })
+}
+
+function purchaseProducts(id, quantity) {
+    connection.query("SELECT * FROM products WHERE ?",
+    [
+        {
+            item_id: id
         }
+    ], function(error, response) {
+        if (error) throw error;
+        var totalStock = response[0].stock_quantity - quantity;
+        if (totalStock <= 0) {
+            console.log(chalk.red("* Sorry, there aren't enough items! Please try again.\n"));
+            productDisplay();
+        } else {
+            connection.end();
+        }
+        // console.log(response);
     })
 }
