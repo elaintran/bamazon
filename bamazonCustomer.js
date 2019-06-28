@@ -1,8 +1,9 @@
 //node packages
 var mysql = require("mysql");
 var inquirer = require("inquirer");
-var chalkTable = require("chalk-table");
 var chalk = require("chalk");
+var chalkTable = require("chalk-table");
+var chalkPipe = require("chalk-pipe");
 //global variables
 var stockQuantity;
 var rows = [];
@@ -80,6 +81,7 @@ function productDisplay() {
     })
 }
 
+//inquirer transformer only works on input and number
 function shopping() {
     inquirer.prompt([
         {
@@ -88,20 +90,31 @@ function shopping() {
             name: "interest"
         }
     ]).then(function(response) {
+        //if user is interested in a product, continue prompts
         if (response.interest) {
             inquirer.prompt([
                 {
+                    //when displaying initial table, get the table length and
+                    //store in variable
                     type: "number",
                     message: "What is the ID of the product you would like to purchase?",
-                    name: "id"
+                    name: "id",
+                    transformer: function(value) {
+                        return chalkPipe("blue")(value);
+                    }
+                    //need to validate from numbers 1 to table length
                 }, {
                     type: "number",
                     message: "How many would you like to purchase?",
-                    name: "quantity"
+                    name: "quantity",
+                    transformer: function(value) {
+                        return chalkPipe("blue")(value);
+                    }
                 }
             ]).then(function(response) {
                 console.log(response);
             })
+        //if user not interested, end program
         } else {
             console.log("Please come again!");
         }
