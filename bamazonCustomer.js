@@ -1,7 +1,8 @@
 //node packages
 var mysql = require("mysql");
 var inquirer = require("inquirer");
-var Table = require("cli-table3");
+// var Table = require("cli-table3");
+var chalkTable = require("chalk-table");
 var chalk = require("chalk");
 
 var connection = mysql.createConnection({
@@ -22,35 +23,51 @@ connection.connect(function(error) {
 })
 
 function productDisplay() {
+    console.log();
     connection.query("SELECT * FROM products", function(error, response) {
         if (error) {
             console.log(error);
         }
-        var table = new Table({
-            head: [chalk.white("ID"), chalk.white("Product"),
-                   chalk.white("Department"), chalk.white("Price"),
-                   chalk.white("Stock")], 
-            colWidths: [5, 15, 15, 10, 10]
-        });
-        var stockQuanity;
+        console.log(chalk.cyan("Welcome") + " to " + chalk.yellow("Bamazon!"));
+        // console.log("Please check out our current products.");
+        var options = {
+            // leftPad: 2,
+            columns: [
+              { field: "id",     name: chalk.yellow("ID") },
+              { field: "product",  name: chalk.yellow("Product") },
+              { field: "department", name: chalk.yellow("Department") },
+              { field: "price",  name: chalk.yellow("Price") },
+              { field: "stock",  name: chalk.yellow("Stock") }
+            ]
+        };
+        var stockQuantity;
+        var rows = [];
         for (var i = 0; i < response.length; i++) {
             // console.log(typeof(response[i].stock_quanity));
-            var responseStock = response[i].stock_quanity;
+            var responseStock = response[i].stock_quantity;
             // stockQuanity.push(responseStock);
             // console.log(stockQuanity);
             if (responseStock === 0) {
-                stockQuanity = chalk.red(responseStock);
+                stockQuantity = chalk.red(responseStock);
             } else if (responseStock >= 1 && responseStock < 6) {
-                stockQuanity = chalk.yellow(responseStock);
+                stockQuantity = chalk.yellow(responseStock);
             } else {
-                stockQuanity = chalk.green(responseStock);
+                stockQuantity = chalk.green(responseStock);
             }
-            table.push(
-                [response[i].item_id, response[i].product_name, response[i].department_name,
-                "$" + response[i].price, stockQuanity]
+            // console.log(typeof(stockQuantity));
+            rows.push(
+                {
+                    // id: chalk.blue(response[i].item_id),
+                    id: response[i].item_id,
+                    product: response[i].product_name,
+                    department: response[i].department_name,
+                    price: "$" + response[i].price,
+                    stock: stockQuantity}
             );
+            var table = chalkTable(options, rows);
         }
-        console.log(table.toString());
+        console.log(table);
+        //(table.toString());
         connection.end();
     })
 }
