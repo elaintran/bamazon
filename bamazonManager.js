@@ -208,14 +208,51 @@ function continueAdd() {
 function newProduct() {
     inquirer.prompt([
         {
-            //camelcase regex?
             type: "input",
             message: "What product would you like to add?",
-            name: "product"
+            name: "product",
+            //capitalize the first letter of every word
+            //does not affect actual value, so need to capitalize again
+            transformer: function(value) {
+                var valueArr = value.toLowerCase().split(" ");
+                //initially used an empty string, but results in choppy typing movement
+                //on the command line
+                var newValue = [];
+                for (var i = 0; i < valueArr.length; i++) {
+                    var capitalize = valueArr[i].charAt(0).toUpperCase() + valueArr[i].slice(1);
+                    newValue.push(capitalize);
+                }
+                return chalk.cyan(newValue.join(" "));
+            },
+            validate: function(value) {
+                //if value is not an empty string
+                if (value !== "") {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
         }, {
             type: "input",
             message: "What department does it belong to?",
-            name: "department"
+            name: "department",
+            transformer: function(value) {
+                var valueArr = value.toLowerCase().split(" ");
+                var newValue = [];
+                for (var i = 0; i < valueArr.length; i++) {
+                    var capitalize = valueArr[i].charAt(0).toUpperCase() + valueArr[i].slice(1);
+                    newValue.push(capitalize);
+                }
+                return chalk.cyan(newValue.join(" "));
+            },
+            validate: function(value) {
+                //if value is not a number and value is not an empty string
+                if (isNaN(value) && value !== "") {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
         }, {
             //need to determine how to allow decimals up to 2 spaces
             type: "number",
@@ -246,3 +283,5 @@ function pushRows(id, product, department, price, stock) {
 }
 
 //maybe add an option to remove items from the list
+//would also like to place transformer functions in a constructor
+//but the function would only be called once
