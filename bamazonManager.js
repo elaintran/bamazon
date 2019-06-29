@@ -7,7 +7,18 @@ var chalkPipe = require("chalk-pipe");
 require('dotenv').config();
 //global variables
 var stockQuantity;
+//table
+var headers = {
+    columns: [
+        { field: "id", name: "ID" },
+        { field: "product", name: "Product" },
+        { field: "department", name: "Department" },
+        { field: "price", name: "Price" },
+        { field: "stock", name: "Stock" }
+    ]
+};
 var rows = [];
+var table;
 
 //set up a mysql connection
 var connection = mysql.createConnection({
@@ -46,7 +57,7 @@ function managerPrompt() {
                 lowInventory();
                 break;
             case "Add to Inventory":
-                restock();
+                addInventory();
                 break;
             case "Add New Product":
                 newProduct();
@@ -61,16 +72,6 @@ function productDisplay() {
     //display current database info in a table
     connection.query("SELECT * FROM products", function(error, response) {
         if (error) throw error;
-        //table header
-        var headers = {
-            columns: [
-                { field: "id", name: "ID" },
-                { field: "product", name: "Product" },
-                { field: "department", name: "Department" },
-                { field: "price", name: "Price" },
-                { field: "stock", name: "Stock" }
-            ]
-        };
         //clear table before loop
         rows = [];
         //loop through database items for specific values
@@ -86,21 +87,44 @@ function productDisplay() {
                 stockQuantity = chalk.green(responseStock);
             }
             //database items are pushed into an array to display on a table
-            rows.push(
-                {
-                    // id: chalk.blue(response[i].item_id),
-                    id: response[i].item_id,
-                    product: response[i].product_name,
-                    department: response[i].department_name,
-                    price: "$" + response[i].price,
-                    stock: stockQuantity
-                }
-            );
+            pushRows(response[i].item_id, response[i].product_name, response[i].department_name, response[i].price, stockQuantity);
         }
         //create table using the headers and rows
-        var table = chalkTable(headers, rows);
+        table = chalkTable(headers, rows);
         //display table on the console
         console.log("\n" + table + "\n");
         managerPrompt();
     })
-}    
+}
+
+function lowInventory() {
+    connection.query("SELECT * FROM products", function(error, response) {
+        if (error) throw error;
+        rows = [];
+        for (var i = 0; i < response.length; i++) {
+            if (response[i].stock_quantity < 10) {
+                if (response[i].stock_quantity === 0) {
+                    var lowStock = chalk.red(response[i].stock_quantity);
+                } else {
+                    var lowStock = chalk.yellow(response[i].stock_quantity);
+                }
+                pushRows(response[i].item_id, response[i].product_name, response[i].department_name, response[i].price, lowStock);
+            }
+        }
+        table = chalkTable(headers, rows);
+        console.log("\n" + table + "\n");
+        managerPrompt();
+    })
+}
+
+function pushRows(id, product, department, price, stock) {
+    rows.push(
+        {
+            id: id,
+            product: product,
+            department: department,
+            price: "$" + price,
+            stock: stock
+        }
+    );
+}

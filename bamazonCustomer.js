@@ -6,9 +6,19 @@ var chalkTable = require("chalk-table");
 var chalkPipe = require("chalk-pipe");
 require('dotenv').config();
 //global variables
+//table
+var headers = {
+    columns: [
+        { field: "id",     name: "ID" },
+        { field: "product",  name: "Product" },
+        { field: "department", name: "Department" },
+        { field: "price",  name: "Price" },
+        { field: "stock",  name: "Stock" }
+    ]
+};
+var rows = [];
 var itemTotal = 0;
 var stockQuantity;
-var rows = [];
 var amountSpent = 0;
 
 //set up a mysql connection
@@ -35,16 +45,6 @@ function productDisplay() {
     //display current database info in a table
     connection.query("SELECT * FROM products", function(error, response) {
         if (error) throw error;
-        //table header
-        var headers = {
-            columns: [
-                { field: "id",     name: "ID" },
-                { field: "product",  name: "Product" },
-                { field: "department", name: "Department" },
-                { field: "price",  name: "Price" },
-                { field: "stock",  name: "Stock" }
-            ]
-        };
         //clear table before loop
         rows = [];
         //assign total number of items to prevent users from
@@ -57,22 +57,13 @@ function productDisplay() {
             var responseStock = response[i].stock_quantity;
             if (responseStock === 0) {
                 stockQuantity = chalk.red(responseStock);
-            } else if (responseStock >= 1 && responseStock < 11) {
+            } else if (responseStock >= 1 && responseStock < 10) {
                 stockQuantity = chalk.yellow(responseStock);
             } else {
                 stockQuantity = chalk.green(responseStock);
             }
             //database items are pushed into an array to display on a table
-            rows.push(
-                {
-                    // id: chalk.blue(response[i].item_id),
-                    id: response[i].item_id,
-                    product: response[i].product_name,
-                    department: response[i].department_name,
-                    price: "$" + response[i].price,
-                    stock: stockQuantity
-                }
-            );
+            pushRows(response[i].item_id, response[i].product_name, response[i].department_name, response[i].price, stockQuantity);
         }
         //create table using the headers and rows
         var table = chalkTable(headers, rows);
@@ -80,6 +71,18 @@ function productDisplay() {
         console.log(table + "\n");
         purchasePrompt();
     })
+}
+
+function pushRows(id, product, department, price, stock) {
+    rows.push(
+        {
+            id: id,
+            product: product,
+            department: department,
+            price: "$" + price,
+            stock: stock
+        }
+    );
 }
 
 function purchasePrompt() {
