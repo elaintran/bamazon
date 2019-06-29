@@ -20,6 +20,7 @@
     "chalk": "^2.4.2",
     "chalk-pipe": "^2.0.0",
     "chalk-table": "^1.0.2",
+    "dotenv": "^8.0.0",
     "inquirer": "^6.4.1",
     "mysql": "^2.17.1"
   }

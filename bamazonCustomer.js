@@ -4,6 +4,7 @@ var inquirer = require("inquirer");
 var chalk = require("chalk");
 var chalkTable = require("chalk-table");
 var chalkPipe = require("chalk-pipe");
+require('dotenv').config();
 //global variables
 var itemTotal = 0;
 var stockQuantity;
@@ -15,7 +16,7 @@ var connection = mysql.createConnection({
     host: "localhost",
     port: 3306,
     user: "root",
-    password: "root",
+    password: process.env.DB_PASSWORD,
     database: "bamazon"
 })
 
@@ -131,13 +132,19 @@ function purchaseProducts(id, quantity) {
         }
     ], function(error, response) {
         if (error) throw error;
+        //check if there is enough quantity
         var totalStock = response[0].stock_quantity - quantity;
+        //if totalStock is a negative number
         if (totalStock < 0) {
             console.log(chalk.red("> Sorry, there aren't enough items! Please try again.\n"));
             //ask user to enter id and quantity again
             purchasePrompt();
+        //if totalStock is positive, initiate the purchase
         } else {
+            //total of the current purchase
             var totalPrice = quantity * response[0].price;
+            //total of all purchases
+            amountSpent += totalPrice;
             //update database
             updateTable(id, totalStock, quantity, totalPrice);
         }
@@ -145,6 +152,7 @@ function purchaseProducts(id, quantity) {
 }
 
 function updateTable(id, totalStock, totalQuantity, totalPrice) {
+    //use the id to update the stock in the database
     connection.query("UPDATE products SET ? WHERE ?",
     [
         {
@@ -154,8 +162,8 @@ function updateTable(id, totalStock, totalQuantity, totalPrice) {
         }
     ], function(error, response) {
         if (error) throw error;
-        amountSpent += totalPrice;
         console.log(chalk.green("> " + totalQuantity + " item(s) were successfully purchased for a total of $" + totalPrice + "!"));
+        //amountSpent is updated everytime the user purchases a product
         console.log(chalk.yellow("> Your total spent is: $" + amountSpent + ".\n"));
         continuePurchasePrompt();
     })
@@ -170,6 +178,7 @@ function continuePurchasePrompt() {
         }
     ]).then(function(response) {
         if (response.confirm) {
+            //empty line between prompt and table
             console.log("");
             productDisplay();
         } else {
