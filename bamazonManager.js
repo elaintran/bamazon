@@ -3,7 +3,6 @@ var mysql = require("mysql");
 var inquirer = require("inquirer");
 var chalk = require("chalk");
 var chalkTable = require("chalk-table");
-var chalkPipe = require("chalk-pipe");
 require('dotenv').config();
 //global variables
 var itemTotal;
@@ -37,6 +36,7 @@ connection.connect(function(error) {
     }
     //connection success message
     // console.log("connected as id " + connection.threadId);
+    console.log("");
     managerPrompt();
 })
 
@@ -44,9 +44,9 @@ function managerPrompt() {
     inquirer.prompt([
         {
             type: "list",
-            message: "What action would you like to perform?",
+            message: "What type of action would you like to perform?",
             choices: ["View Products for Sale", "View Low Inventory", "Add to Inventory",
-                      "Add New Product", "Exit"],
+                      "Add New Product", "Remove Existing Product", "Exit"],
             name: "action"
         }
     ]).then(function(response) {
@@ -64,6 +64,7 @@ function managerPrompt() {
                 newProduct();
                 break;
             default:
+                console.log(chalk.yellow("> Thanks again!\n"));
                 connection.end();
         }
     })
@@ -132,9 +133,6 @@ function addInventory() {
             type: "number",
             message: "What is the ID of the product you would like to restock?",
             name: "id",
-            transformer: function(value) {
-                return chalkPipe("blue")(value);
-            },
             validate: function(value) {
                 //if value is a number, if it is an number listed as an id, and if value is a whole number
                 var integerCheck = value % 1;
@@ -148,9 +146,6 @@ function addInventory() {
             type: "number",
             message: "How many items would you like to add?",
             name: "quantity",
-            transformer: function(value) {
-                return chalkPipe("blue")(value);
-            },
             validate: function(value) {
                 var integerCheck = value % 1;
                 //if value is a number, if 1 or more items are added, if value is a whole number
@@ -204,6 +199,7 @@ function continueAdd() {
         if (response.confirm) {
             addInventory();
         } else {
+            console.log("");
             managerPrompt();
         }
     })
@@ -212,6 +208,7 @@ function continueAdd() {
 function newProduct() {
     inquirer.prompt([
         {
+            //camelcase regex?
             type: "input",
             message: "What product would you like to add?",
             name: "product"
@@ -220,16 +217,19 @@ function newProduct() {
             message: "What department does it belong to?",
             name: "department"
         }, {
+            //need to determine how to allow decimals up to 2 spaces
             type: "number",
             message: "What is the selling price?",
             name: "price"
         }, {
+            //allow only whole numbers
             type: "number",
             message: "How many are in stock?",
             name: "stock"
         }
     ]).then(function(response) {
         console.log(response);
+        managerPrompt();
     })
 }
 
@@ -244,3 +244,5 @@ function pushRows(id, product, department, price, stock) {
         }
     );
 }
+
+//maybe add an option to remove items from the list

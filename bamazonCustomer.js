@@ -3,7 +3,6 @@ var mysql = require("mysql");
 var inquirer = require("inquirer");
 var chalk = require("chalk");
 var chalkTable = require("chalk-table");
-var chalkPipe = require("chalk-pipe");
 require('dotenv').config();
 //global variables
 var itemTotal;
@@ -12,7 +11,7 @@ var amountSpent = 0;
 //table
 var headers = {
     columns: [
-        { field: "id",     name: "ID" },
+        { field: "id",  name: "ID" },
         { field: "product",  name: "Product" },
         { field: "department", name: "Department" },
         { field: "price",  name: "Price" },
@@ -91,9 +90,6 @@ function purchasePrompt() {
             type: "number",
             message: "What is the ID of the product you would like to purchase?",
             name: "id",
-            transformer: function(value) {
-                return chalkPipe("blue")(value);
-            },
             validate: function(value) {
                 //if value is a number, if it is an number listed as an id, and if value is a whole number
                 var integerCheck = value % 1;
@@ -107,9 +103,6 @@ function purchasePrompt() {
             type: "number",
             message: "How many would you like to purchase?",
             name: "quantity",
-            transformer: function(value) {
-                return chalkPipe("blue")(value);
-            },
             validate: function(value) {
                 var integerCheck = value % 1;
                 //if value is a number, if more than 1 item is purchased, if value is a whole number
@@ -183,7 +176,7 @@ function continuePurchasePrompt() {
             console.log("");
             productDisplay();
         } else {
-            console.log(chalk.yellow("> Thank you for stopping by!"));
+            console.log(chalk.yellow("> Thank you for stopping by!\n"));
             connection.end();
         }
     })
