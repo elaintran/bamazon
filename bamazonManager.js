@@ -209,6 +209,30 @@ function continueAdd() {
     })
 }
 
+function newProduct() {
+    inquirer.prompt([
+        {
+            type: "input",
+            message: "What product would you like to add?",
+            name: "product"
+        }, {
+            type: "input",
+            message: "What department does it belong to?",
+            name: "department"
+        }, {
+            type: "number",
+            message: "What is the selling price?",
+            name: "price"
+        }, {
+            type: "number",
+            message: "How many are in stock?",
+            name: "stock"
+        }
+    ]).then(function(response) {
+        console.log(response);
+    })
+}
+
 function pushRows(id, product, department, price, stock) {
     rows.push(
         {
