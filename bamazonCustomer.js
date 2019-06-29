@@ -5,8 +5,10 @@ var chalk = require("chalk");
 var chalkTable = require("chalk-table");
 var chalkPipe = require("chalk-pipe");
 //global variables
+var itemTotal = 0;
 var stockQuantity;
 var rows = [];
+var amountSpent = 0;
 
 //set up a mysql connection
 var connection = mysql.createConnection({
@@ -34,8 +36,6 @@ function productDisplay() {
         if (error) {
             console.log(error);
         }
-        // console.log(chalk.cyan("Welcome") + " to " + chalk.yellow("Bamazon!"));
-        // console.log("Please check out our current products.");
         //table header
         var headers = {
             //table indent
@@ -48,7 +48,11 @@ function productDisplay() {
               { field: "stock",  name: "Stock" }
             ]
         };
+        //clear table before loop
         rows = [];
+        //assign total number of items to prevent users from
+        //picking an id not included from the table
+        itemTotal = response.length;
         //loop through database items for specific values
         for (var i = 0; i < response.length; i++) {
             //change stock number color to red, yellow, or green according to
@@ -91,6 +95,13 @@ function purchasePrompt() {
             name: "id",
             transformer: function(value) {
                 return chalkPipe("blue")(value);
+            },
+            validate: function(value) {
+                if (!isNaN(value) && value > 0 && value <= itemTotal) {
+                    return true;
+                } else {
+                    return false;
+                }
             }
             //need to validate from numbers 1 to table length
             //and if it is a number
@@ -104,8 +115,6 @@ function purchasePrompt() {
         }
     ]).then(function(response) {
         purchaseProducts(response.id, response.quantity);
-        //console.log(chalk.green("\nSuccess: " + response.quantity + " items(s) were added to your cart!"));
-        //console.log(chalk.yellow("Your current total is: $10."));
     })
 }
 
@@ -119,11 +128,32 @@ function purchaseProducts(id, quantity) {
         if (error) throw error;
         var totalStock = response[0].stock_quantity - quantity;
         if (totalStock <= 0) {
-            console.log(chalk.red("* Sorry, there aren't enough items! Please try again.\n"));
+            console.log(chalk.red("> Sorry, there aren't enough items! Please try again.\n"));
+            purchasePrompt();
+        } else {
+            var totalPrice = quantity * response[0].price;
+            amountSpent += totalPrice;
+            console.log(chalk.green("> " + quantity + " item(s) were successfully purchased for a total of $" + totalPrice + "!"));
+            console.log(chalk.yellow("> Your total spent is: $" + amountSpent + ".\n"));
+            continuePurchasePrompt();
+        }
+    })
+}
+
+function continuePurchasePrompt() {
+    inquirer.prompt([
+        {
+            type: "confirm",
+            message: "Would you like to make another purchase?",
+            name: "confirm"
+        }
+    ]).then(function(response) {
+        if (response.confirm) {
+            console.log("");
             productDisplay();
         } else {
+            console.log(chalk.yellow("> Thank you for stopping by!"));
             connection.end();
         }
-        // console.log(response);
     })
 }
