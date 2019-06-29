@@ -64,11 +64,11 @@ function productDisplay() {
         //table header
         var headers = {
             columns: [
-                { field: "id",     name: "ID" },
-                { field: "product",  name: "Product" },
+                { field: "id", name: "ID" },
+                { field: "product", name: "Product" },
                 { field: "department", name: "Department" },
-                { field: "price",  name: "Price" },
-                { field: "stock",  name: "Stock" }
+                { field: "price", name: "Price" },
+                { field: "stock", name: "Stock" }
             ]
         };
         //clear table before loop
