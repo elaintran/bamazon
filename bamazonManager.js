@@ -214,15 +214,8 @@ function newProduct() {
             //capitalize the first letter of every word
             //does not affect actual value, so need to capitalize again
             transformer: function(value) {
-                var valueArr = value.toLowerCase().split(" ");
-                //initially used an empty string, but results in choppy typing movement
-                //on the command line
-                var newValue = [];
-                for (var i = 0; i < valueArr.length; i++) {
-                    var capitalize = valueArr[i].charAt(0).toUpperCase() + valueArr[i].slice(1);
-                    newValue.push(capitalize);
-                }
-                return chalk.cyan(newValue.join(" "));
+                var input = capitalize(value);
+                return input;
             },
             validate: function(value) {
                 //if value is not an empty string
@@ -237,13 +230,8 @@ function newProduct() {
             message: "What department does it belong to?",
             name: "department",
             transformer: function(value) {
-                var valueArr = value.toLowerCase().split(" ");
-                var newValue = [];
-                for (var i = 0; i < valueArr.length; i++) {
-                    var capitalize = valueArr[i].charAt(0).toUpperCase() + valueArr[i].slice(1);
-                    newValue.push(capitalize);
-                }
-                return chalk.cyan(newValue.join(" "));
+                var input = capitalize(value);
+                return input;
             },
             validate: function(value) {
                 //if value is not a number and value is not an empty string
@@ -280,6 +268,18 @@ function pushRows(id, product, department, price, stock) {
             stock: stock
         }
     );
+}
+
+function capitalize(value) {
+    var valueArr = value.toLowerCase().split(" ");
+    //initially used an empty string, but results in choppy typing movement
+    //on the command line
+    var newValue = [];
+        for (var i = 0; i < valueArr.length; i++) {
+            var capitalize = valueArr[i].charAt(0).toUpperCase() + valueArr[i].slice(1);
+            newValue.push(capitalize);
+        }
+    return chalk.cyan(newValue.join(" "));
 }
 
 //maybe add an option to remove items from the list
