@@ -26,7 +26,7 @@ connection.connect(function(error) {
     }
     //connection success message
     // console.log("connected as id " + connection.threadId);
-    console.log("\nWelcome to Bamazon!");
+    console.log(chalk.yellow("\n> Welcome to Bamazon!"));
     productDisplay();
 })
 
@@ -88,8 +88,6 @@ function productDisplay() {
 function purchasePrompt() {
     inquirer.prompt([
         {
-            //when displaying initial table, get the table length and
-            //store in variable
             type: "number",
             message: "What is the ID of the product you would like to purchase?",
             name: "id",
@@ -97,20 +95,29 @@ function purchasePrompt() {
                 return chalkPipe("blue")(value);
             },
             validate: function(value) {
-                if (!isNaN(value) && value > 0 && value <= itemTotal) {
+                //if value is a number, if it is an number listed as an id, and if value is a whole number
+                var integerCheck = value % 1;
+                if (!isNaN(value) && value > 0 && value <= itemTotal && integerCheck === 0) {
                     return true;
                 } else {
                     return false;
                 }
             }
-            //need to validate from numbers 1 to table length
-            //and if it is a number
         }, {
             type: "number",
             message: "How many would you like to purchase?",
             name: "quantity",
             transformer: function(value) {
                 return chalkPipe("blue")(value);
+            },
+            validate: function(value) {
+                var integerCheck = value % 1;
+                //if value is a number, if more than 1 item is purchased, if value is a whole number
+                if (!isNaN(value) && value > 0 && integerCheck === 0) {
+                    return true;
+                } else {
+                    return false;
+                }
             }
         }
     ]).then(function(response) {
