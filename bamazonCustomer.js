@@ -6,6 +6,9 @@ var chalkTable = require("chalk-table");
 var chalkPipe = require("chalk-pipe");
 require('dotenv').config();
 //global variables
+var itemTotal;
+var stockQuantity;
+var amountSpent = 0;
 //table
 var headers = {
     columns: [
@@ -17,9 +20,6 @@ var headers = {
     ]
 };
 var rows = [];
-var itemTotal = 0;
-var stockQuantity;
-var amountSpent = 0;
 
 //set up a mysql connection
 var connection = mysql.createConnection({
@@ -57,7 +57,7 @@ function productDisplay() {
             var responseStock = response[i].stock_quantity;
             if (responseStock === 0) {
                 stockQuantity = chalk.red(responseStock);
-            } else if (responseStock >= 1 && responseStock < 10) {
+            } else if (responseStock >= 1 && responseStock < 6) {
                 stockQuantity = chalk.yellow(responseStock);
             } else {
                 stockQuantity = chalk.green(responseStock);
