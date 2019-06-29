@@ -139,23 +139,23 @@ function purchaseProducts(id, quantity) {
         } else {
             var totalPrice = quantity * response[0].price;
             //update database
-            updateTable(id, totalStock, totalPrice);
+            updateTable(id, totalStock, quantity, totalPrice);
         }
     })
 }
 
-function updateTable(id, quantity, totalPrice) {
+function updateTable(id, totalStock, totalQuantity, totalPrice) {
     connection.query("UPDATE products SET ? WHERE ?",
     [
         {
-            stock_quantity: quantity
+            stock_quantity: totalStock
         }, {
             item_id: id
         }
     ], function(error, response) {
         if (error) throw error;
         amountSpent += totalPrice;
-        console.log(chalk.green("> " + quantity + " item(s) were successfully purchased for a total of $" + totalPrice + "!"));
+        console.log(chalk.green("> " + totalQuantity + " item(s) were successfully purchased for a total of $" + totalPrice + "!"));
         console.log(chalk.yellow("> Your total spent is: $" + amountSpent + ".\n"));
         continuePurchasePrompt();
     })
