@@ -34,17 +34,15 @@ connection.connect(function(error) {
 function productDisplay() {
     //display current database info in a table
     connection.query("SELECT * FROM products", function(error, response) {
-        if (error) {
-            console.log(error);
-        }
+        if (error) throw error;
         //table header
         var headers = {
             columns: [
-              { field: "id",     name: "ID" },
-              { field: "product",  name: "Product" },
-              { field: "department", name: "Department" },
-              { field: "price",  name: "Price" },
-              { field: "stock",  name: "Stock" }
+                { field: "id",     name: "ID" },
+                { field: "product",  name: "Product" },
+                { field: "department", name: "Department" },
+                { field: "price",  name: "Price" },
+                { field: "stock",  name: "Stock" }
             ]
         };
         //clear table before loop
