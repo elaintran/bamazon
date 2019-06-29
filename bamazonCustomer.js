@@ -26,7 +26,7 @@ connection.connect(function(error) {
     }
     //connection success message
     // console.log("connected as id " + connection.threadId);
-    console.log(chalk.yellow("\n> Welcome to Bamazon!"));
+    console.log(chalk.yellow("\n> Welcome to Bamazon: The Furniture Edition!"));
     productDisplay();
 })
 
@@ -38,8 +38,6 @@ function productDisplay() {
         }
         //table header
         var headers = {
-            //table indent
-            // leftPad: 2,
             columns: [
               { field: "id",     name: "ID" },
               { field: "product",  name: "Product" },
@@ -134,16 +132,32 @@ function purchaseProducts(id, quantity) {
     ], function(error, response) {
         if (error) throw error;
         var totalStock = response[0].stock_quantity - quantity;
-        if (totalStock <= 0) {
+        if (totalStock < 0) {
             console.log(chalk.red("> Sorry, there aren't enough items! Please try again.\n"));
+            //ask user to enter id and quantity again
             purchasePrompt();
         } else {
             var totalPrice = quantity * response[0].price;
-            amountSpent += totalPrice;
-            console.log(chalk.green("> " + quantity + " item(s) were successfully purchased for a total of $" + totalPrice + "!"));
-            console.log(chalk.yellow("> Your total spent is: $" + amountSpent + ".\n"));
-            continuePurchasePrompt();
+            //update database
+            updateTable(id, totalStock, totalPrice);
         }
+    })
+}
+
+function updateTable(id, quantity, totalPrice) {
+    connection.query("UPDATE products SET ? WHERE ?",
+    [
+        {
+            stock_quantity: quantity
+        }, {
+            item_id: id
+        }
+    ], function(error, response) {
+        if (error) throw error;
+        amountSpent += totalPrice;
+        console.log(chalk.green("> " + quantity + " item(s) were successfully purchased for a total of $" + totalPrice + "!"));
+        console.log(chalk.yellow("> Your total spent is: $" + amountSpent + ".\n"));
+        continuePurchasePrompt();
     })
 }
 
