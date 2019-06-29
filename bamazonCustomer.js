@@ -160,9 +160,9 @@ function updateTable(id, totalStock, totalQuantity, totalPrice) {
         }
     ], function(error, response) {
         if (error) throw error;
-        console.log(chalk.green(`> ${totalQuantity} item(s) were successfully purchased for a total of $${totalPrice}!")`);
+        console.log(chalk.green(`> ${totalQuantity} item(s) were successfully purchased for a total of $${totalPrice}!`));
         //amountSpent is updated everytime the user purchases a product
-        console.log(chalk.yellow(`> Your total spent is: $${amountSpent}.\n"`);
+        console.log(chalk.yellow(`> Your total spent is: $${amountSpent}.\n`));
         continuePurchasePrompt();
     })
 }
