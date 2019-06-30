@@ -252,7 +252,7 @@ function newProduct() {
             }
         }, {
             type: "number",
-            message: "How much would you like to sell it for?",
+            message: "What is the price of this product?",
             name: "price",
             transformer: function(value) {
                 return chalk.cyan(value);

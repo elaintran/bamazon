@@ -72,7 +72,8 @@ function productSales() {
     //departments is the left table
     "FROM departments " +
     //join by department names
-    "INNER JOIN products ON products.department_name = departments.department_name " +
+    //need to left join because departments won't display if using inner join
+    "LEFT JOIN products ON products.department_name = departments.department_name " +
     //merge all of the departments by same name together
     "GROUP BY department_name;";
     connection.query(selectQuery, function(error, response) {
@@ -91,6 +92,52 @@ function productSales() {
         table = chalkTable(headers, rows);
         //display table on the console
         console.log(`\n${table}\n`);
+        supervisorPrompt();
+    })
+}
+
+function newDepartment() {
+    inquirer.prompt([
+        {
+            type: "input",
+            message: "What department would you like to add?",
+            name: "department"
+        }, {
+            type: "number",
+            message: "What are the overhead costs?",
+            name: "overhead"
+        }
+    ]).then(function(response) {
+        // console.log(response.department + " " + response.overhead);
+        checkDepartment(response.department, response.overhead);
+    })
+}
+
+function checkDepartment(department, overhead) {
+    connection.query("SELECT * FROM departments WHERE ?", [
+        {
+            department_name: department
+        }
+    ], function(error, response) {
+        if (error) throw error;
+        if (response.length === 0) {
+            addDepartment(department, overhead);
+        } else {
+            console.log(chalk.red(`> ${department} already exists. Please try again.\n`));
+            newDepartment();
+        }
+    })
+}
+
+function addDepartment(department, overhead) {
+    connection.query("INSERT INTO departments SET ?", [
+        {
+            department_name: department,
+            over_head_costs: overhead
+        }
+    ], function(error, response) {
+        if (error) throw error;
+        console.log(chalk`{green > Successfully added a new department called ${department}!}\n`);
         supervisorPrompt();
     })
 }
