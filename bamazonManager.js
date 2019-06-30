@@ -245,16 +245,53 @@ function newProduct() {
             //need to determine how to allow decimals up to 2 spaces
             type: "number",
             message: "What is the selling price?",
-            name: "price"
+            name: "price",
+            transformer: function(value) {
+                return chalk.cyan(value);
+            },
+            validate: function(value) {
+                //if value is a number
+                if (!isNaN(value)) {
+                    //convert value into string to find decimal point and use substring
+                    var valueString = value.toString();
+                    var decimalCheck = valueString.indexOf(".");
+                    //if value has a decimal
+                    if (decimalCheck !== -1) {
+                        //get values first the first and second number after the decimal
+                        var pointOne = valueString.substring(decimalCheck + 1, decimalCheck + 3);
+                        var pointTwo = valueString.substring(decimalCheck + 1, decimalCheck + 4);
+                        //if value has one or two decimal points
+                        if(pointOne.length === 1 || pointTwo.length === 2) {
+                            return true;
+                        } else {
+                            //return false if there are more than two decimal points
+                            return false;
+                        }
+                    }
+                    //return true if whole number
+                    return true;
+                } else {
+                    return false;
+                }
+            }
         }, {
             //allow only whole numbers
             type: "number",
             message: "How many are in stock?",
-            name: "stock"
+            name: "stock",
+            validate: function(value) {
+                var integerCheck = value % 1;
+                if (!isNaN(value) && integerCheck === 0) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
         }
     ]).then(function(response) {
         console.log(response);
-        managerPrompt();
+        connection.end();
+        // managerPrompt();
     })
 }
 
@@ -283,5 +320,3 @@ function capitalize(value) {
 }
 
 //maybe add an option to remove items from the list
-//would also like to place transformer functions in a constructor
-//but the function would only be called once
