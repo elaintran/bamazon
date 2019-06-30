@@ -167,7 +167,9 @@ function addInventory() {
                     if (value > 0 && integerCheck === 0) {
                         return true;
                     } else if (value <= 0) {
-                        return chalk.red("Please enter a number greater than zero.");
+                        return chalk.red("Please enter a valid number.");
+                    } else if (value > 2000) {
+                        return chalk.red("Please enter a number less than 2000.");
                     } else if (integerCheck !== 0) {
                         return (chalk.red("Please enter a whole number."));
                     } else {
@@ -223,12 +225,8 @@ function newProduct() {
                 return chalk.cyan(input);
             },
             validate: function(value) {
-                //if value is not an empty string
-                if (value !== "") {
-                    return true;
-                } else {
-                    return chalk.red("Please enter a product.");
-                }
+                var input = inputRestrict(value, "department");
+                return input;
             }
         }, {
             type: "input",
@@ -239,16 +237,8 @@ function newProduct() {
                 return chalk.cyan(input);
             },
             validate: function(value) {
-                //if value is not a number and value is not an empty string
-                if (isNaN(value) && value !== "") {
-                    return true;
-                } else if (!isNaN(value)) {
-                    return chalk.red("Please use words only.");
-                } else if (value === "") {
-                    return chalk.red("Please enter a department.");
-                } else {
-                    return false;
-                }
+                var input = inputRestrict(value, "department");
+                return input;
             }
         }, {
             type: "number",
@@ -272,11 +262,15 @@ function newProduct() {
                             return true;
                         } else {
                             //return false if there is one decimal or more than two decimal points
-                            return chalk.red("Please enter a number with two decimal places.");
+                            return chalk.red("Please enter a price with two decimal places.");
                         }
                     }
-                    //return true if whole number
-                    return true;
+                    if (value > 2000) {
+                        return chalk.red("Please enter a price less than 2000.");
+                    } else {
+                        //return true if whole number
+                        return true;
+                    }
                 //if value is a string
                 } else {
                     return chalk.red("Please enter a valid price.");
@@ -284,7 +278,7 @@ function newProduct() {
             }
         }, {
             type: "number",
-            message: "How many are in stock?",
+            message: "How much would you like to stock?",
             name: "stock",
             transformer: function(value) {
                 return chalk.cyan(value);
@@ -378,6 +372,19 @@ function capitalize(value) {
             newValue.push(capitalize);
         }
     return newValue.join(" ");
+}
+
+function inputRestrict(value, type) {
+    //if value is not a number and value is not an empty string
+    if (isNaN(value) && value !== "") {
+        return true;
+    } else if (!isNaN(value)) {
+        return chalk.red("Please use words only.");
+    } else if (value === "") {
+        return chalk.red(`Please enter a ${type}.`);
+    } else {
+        return false;
+    }
 }
 
 //when user adds an product in a department not listed,

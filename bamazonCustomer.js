@@ -128,7 +128,7 @@ function purchasePrompt() {
                     if (value > 0 && integerCheck === 0) {
                         return true;
                     } else if (value <= 0) {
-                        return chalk.red("Please enter a number greater than zero.");
+                        return chalk.red("Please enter a valid number.");
                     } else if (integerCheck !== 0) {
                         return (chalk.red("Please enter a whole number."));
                     } else {

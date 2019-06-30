@@ -126,16 +126,21 @@ function newDepartment() {
                 return chalk.cyan(value);
             },
             validate: function(value) {
+                var integerCheck = value % 1;
                 //if value is a number
                 if (!isNaN(value) && value > 0) {
-                    //convert value into string to find decimal point and use substring
-                    var valueString = value.toString();
-                    var decimalIndex = valueString.indexOf(".");
                     //if value has a decimal
-                    if (decimalIndex !== -1) {
+                    if (integerCheck !== 0) {
                         return chalk.red("Please enter a whole number.");
                     }
-                    return true;
+                    //keep overhead cost at a believable amount
+                    if (value >= 1000 && value <= 15000) {
+                        return true;
+                    } else if (value < 1000) {
+                        return chalk.red("Please enter a cost greater than 999.");
+                    } else {
+                        return chalk.red("Please enter a cost less than 150000.");
+                    }
                 //if value is a string
                 } else {
                     return chalk.red("Please enter a valid cost.");
