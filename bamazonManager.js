@@ -46,7 +46,8 @@ function managerPrompt() {
             type: "list",
             message: "What type of action would you like to perform?",
             choices: ["View Products for Sale", "View Low Inventory", "Add to Inventory",
-                      "Add New Product", "Remove Existing Product", "Exit"],
+                      "Add New Product", "Exit"],
+                      //remove existing product
             name: "action"
         }
     ]).then(function(response) {
@@ -170,12 +171,12 @@ function addInventory() {
             }
         }
     ]).then(function(response) {
-        checkProduct(response.id, response.quantity);
+        checkQuantity(response.id, response.quantity);
     })
 }
 
 //check quantity of product before adding additional items
-function checkProduct(id, quantity) {
+function checkQuantity(id, quantity) {
     connection.query("SELECT * FROM products WHERE ?", [
         {
             item_id: id
@@ -288,8 +289,8 @@ function newProduct() {
         }
     ]).then(function(response) {
         //capitalize first letter in products and department
-        var product = capitalize(response.product);
-        var department = capitalize(response.department);
+        var product = capitalize(response.product).trim();
+        var department = capitalize(response.department).trim();
         //check if price is a whole number or decimal
         var price;
         var priceString = response.price.toString();
@@ -310,8 +311,23 @@ function newProduct() {
         } else {
             price = response.price;
         }
-        addProduct(product, department, price, response.stock);
-        // connection.end();
+        checkProduct(product, department, price, response.stock);
+    })
+}
+
+function checkProduct(product, department, price, stock) {
+    connection.query("SELECT * FROM products WHERE ?", [
+        {
+            product_name: product
+        }
+    ], function(error, response) {
+        if (error) throw error;
+        if (response.length === 0) {
+            addProduct(product, department, price, stock);
+        } else {
+            console.log(chalk.red(`> ${product} has already been added. Please try again.\n`));
+            newProduct();
+        }
     })
 }
 
@@ -331,62 +347,63 @@ function addProduct(product, department, price, stock) {
     })
 }
 
-function deletePrompt() {
-    inquirer.prompt([
-        {
-            type: "number",
-            message: "What is the ID of the product you would like to remove?",
-            name: "id",
-            transformer: function(value) {
-                return chalk.cyan(value);
-            },
-            validate: function(value) {
-                //if value is a number, if it is an number listed as an id, and if value is a whole number
-                var integerCheck = value % 1;
-                if (!isNaN(value) && value > 0 && value <= itemTotal && integerCheck === 0) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-        }, {
-            type: "confirm",
-            message: "Are you sure?",
-            name: "confirm",
-            default: false
-        }
-    ]).then(function(response) {
-        if (response.confirm) {
-            checkProductName(response.id);
-        } else {
-            console.log("");
-            managerPrompt();
-        }
-    })
-}
+//delete product on hold due to issue with primary key
+// function deletePrompt() {
+//     inquirer.prompt([
+//         {
+//             type: "number",
+//             message: "What is the ID of the product you would like to remove?",
+//             name: "id",
+//             transformer: function(value) {
+//                 return chalk.cyan(value);
+//             },
+//             validate: function(value) {
+//                 //if value is a number, if it is an number listed as an id, and if value is a whole number
+//                 var integerCheck = value % 1;
+//                 if (!isNaN(value) && value > 0 && value <= itemTotal && integerCheck === 0) {
+//                     return true;
+//                 } else {
+//                     return false;
+//                 }
+//             }
+//         }, {
+//             type: "confirm",
+//             message: "Are you sure?",
+//             name: "confirm",
+//             default: false
+//         }
+//     ]).then(function(response) {
+//         if (response.confirm) {
+//             checkId(response.id);
+//         } else {
+//             console.log("");
+//             managerPrompt();
+//         }
+//     })
+// }
 
-function checkProductName(id) {
-    connection.query("SELECT * FROM products WHERE ?", [
-        {
-            item_id: id
-        }
-    ], function(error, response) {
-        if (error) throw error;
-        deleteProduct(id, response[0].product_name);
-    })
-}
+// function checkId(id) {
+//     connection.query("SELECT * FROM products WHERE ?", [
+//         {
+//             item_id: id
+//         }
+//     ], function(error, response) {
+//         if (error) throw error;
+//         deleteProduct(id, response[0].product_name);
+//     })
+// }
 
-function deleteProduct(id, product) {
-    connection.query("DELETE FROM products WHERE ?", [
-        {
-            item_id: id
-        }
-    ], function(error, response) {
-        if (error) throw error;
-        console.log(chalk.green(`> Successfully removed ${product} from the store!\n`));
-        managerPrompt();
-    })
-}
+// function deleteProduct(id, product) {
+//     connection.query("DELETE FROM products WHERE ?", [
+//         {
+//             item_id: id
+//         }
+//     ], function(error, response) {
+//         if (error) throw error;
+//         console.log(chalk.green(`> Successfully removed ${product} from the store!\n`));
+//         managerPrompt();
+//     })
+// }
 
 function pushRows(id, product, department, price, stock) {
     rows.push(
