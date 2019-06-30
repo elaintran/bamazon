@@ -11,10 +11,10 @@ var stockQuantity;
 var headers = {
     columns: [
         { field: "id", name: "ID" },
-        { field: "product", name: "Department" },
-        { field: "department", name: "Overhead Costs" },
-        { field: "price", name: "Product Sales" },
-        { field: "stock", name: "Total Profit" }
+        { field: "department", name: "Department" },
+        { field: "overhead", name: "Overhead Costs" },
+        { field: "sales", name: "Product Sales" },
+        { field: "profit", name: "Total Profit" }
     ]
 };
 var rows = [];
@@ -50,8 +50,8 @@ function supervisorPrompt() {
         }
     ]).then(function(response) {
         switch(response.action) {
-            case "View Products Sales by Department":
-                mergeTables();
+            case "View Product Sales by Department":
+                productSales();
                 break;
             case "Create New Department":
                 newDepartment();
@@ -63,6 +63,54 @@ function supervisorPrompt() {
     })
 }
 
-// function mergeTables() {
-//     connection.query("SELECT department_name FROM products INNER JOIN departments")
-// }
+function productSales() {
+    //pass department_id, department_name, and overhead cost as table columns
+    var selectQuery = "SELECT department_id, departments.department_name, over_head_costs," +
+    //department name has the table name infront to specify which header to use
+    //using alias to rename product_sales and total_profit
+    //if no alias is used, the default name is passed as a header
+    "SUM(product_sales) AS product_sales," +
+    "product_sales - over_head_costs AS total_profit " +
+    //departments is the left table
+    "FROM departments " +
+    //join by department names
+    "INNER JOIN products ON products.department_name = departments.department_name " +
+    //merge all of the departments by same name together
+    "GROUP BY department_name;";
+    connection.query(selectQuery, function(error, response) {
+        if (error) throw error;
+        row = [];
+        for (var i = 0; i < response.length; i++) {
+            var overheadCost = "$" + response[i].over_head_costs;
+            if (response[0].product_sales === null) {
+                var productSales = chalk.yellow("N/A");
+            } else {
+                var productSales = "$" + response[0].product_sales;
+            }
+            if (response[0].total_profit === null) {
+                var totalProfit = chalk.yellow("N/A");
+            } else if (Math.sign(response[0].total_profit) === -1) {
+                var totalProfit = chalk.red(`$${response[0].total_profit}`);
+            } else {
+                var totalProfit = chalk.green(`$${response[0].total_profit}`);
+            }
+            pushRows(response[i].department_id, response[i].department_name, overheadCost, productSales, totalProfit);
+        }
+        table = chalkTable(headers, rows);
+        //display table on the console
+        console.log(`\n${table}\n`);
+        supervisorPrompt();
+    })
+}
+
+function pushRows(id, department, overhead, sales, profit) {
+    rows.push(
+        {
+            id: id,
+            department: department,
+            overhead: overhead,
+            sales: sales,
+            profit: profit
+        }
+    );
+}

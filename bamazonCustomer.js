@@ -67,7 +67,7 @@ function productDisplay() {
         //create table using the headers and rows
         var table = chalkTable(headers, rows);
         //display table on the console
-        console.log(table + "\n");
+        console.log(`${table}\n`);
         purchasePrompt();
     })
 }
