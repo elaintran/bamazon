@@ -63,6 +63,9 @@ function managerPrompt() {
             case "Add New Product":
                 newProduct();
                 break;
+            case "Remove Existing Product":
+                productDisplay(response.action);
+                break;
             default:
                 console.log(chalk.yellow("> Thanks again!\n"));
                 connection.end();
@@ -99,10 +102,15 @@ function productDisplay(action) {
         //both product display and add inventory should display table,
         //but table will display last due to async
         //added conditionals to split the function path and prevent from creating the same table
-        if (action === "View Products for Sale") {
-            managerPrompt();
-        } else {
-            addInventory();
+        switch(action) {
+            case "View Products for Sale":
+                managerPrompt();
+                break;
+            case "Add to Inventory":
+                addInventory();
+                break;
+            default:
+                deletePrompt();
         }
     })
 }
@@ -339,6 +347,40 @@ function addProduct(product, department, price, stock) {
         //opted out from including another inquirer that prompts if user would like to
         //add more products because it would take the same time to enter as the managerPrompt
         managerPrompt();
+    })
+}
+
+function deletePrompt() {
+    inquirer.prompt([
+        {
+            type: "number",
+            message: "What is the ID of the product you would like to remove?",
+            name: "id",
+            transformer: function(value) {
+                return chalk.cyan(value);
+            },
+            validate: function(value) {
+                //if value is a number, if it is an number listed as an id, and if value is a whole number
+                var integerCheck = value % 1;
+                if (!isNaN(value) && value > 0 && value <= itemTotal && integerCheck === 0) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        }, {
+            type: "confirm",
+            message: "Are you sure?",
+            name: "confirm",
+            default: false
+        }
+    ]).then(function(response) {
+        if (response.confirm) {
+            deleteProduct();
+        } else {
+            console.log("");
+            managerPrompt();
+        }
     })
 }
 
