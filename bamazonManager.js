@@ -209,8 +209,8 @@ function updateProduct(id, quantity, totalQuantity, product) {
         }
     ], function(error, response) {
         if (error) throw error;
-        console.log(chalk.green(`> ${quantity} item(s) have been added to ${product}!`));
-        console.log(chalk.yellow(`> ${product} now has a total of ${totalQuantity} item(s).\n`));
+        console.log(chalk`{green > ${quantity} item(s) have been added to ${product}!}
+{yellow > ${product} now has a total of ${totalQuantity} item(s).\n}`);
         managerPrompt();
     })
 }
@@ -361,8 +361,8 @@ function addProduct(product, department, price, stock) {
         }
     ], function(error, response) {
         if (error) throw error;
-        console.log(chalk.green(`> Successfully added ${product} to the ${department} department!`));
-        console.log(chalk.yellow(`> There are currently ${stock} of these item(s) being sold for $${price}.\n`));
+        console.log(chalk`{green > Successfully added ${product} to the ${department} department!}
+{yellow > There are currently ${stock} of these item(s) being sold for $${price}.\n}`);
         managerPrompt();
     })
 }

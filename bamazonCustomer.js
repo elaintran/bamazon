@@ -165,9 +165,9 @@ function updateTable(id, totalStock, totalQuantity, totalPrice) {
         }
     ], function(error, response) {
         if (error) throw error;
-        console.log(chalk.green(`> ${totalQuantity} item(s) were successfully purchased for a total of $${totalPrice}!`));
         //amountSpent is updated everytime the user purchases a product
-        console.log(chalk.yellow(`> Your total spent is: $${amountSpent}.\n`));
+        console.log(chalk`{green > ${totalQuantity} item(s) were successfully purchased for a total of $${totalPrice}!}
+{yellow > Your total spent is: $${amountSpent}.\n}`);
         continuePurchasePrompt();
     })
 }
@@ -177,7 +177,10 @@ function continuePurchasePrompt() {
         {
             type: "confirm",
             message: "Would you like to make another purchase?",
-            name: "confirm"
+            name: "confirm",
+            transformer: function(value) {
+                return chalk.cyan(value);
+            }
         }
     ]).then(function(response) {
         if (response.confirm) {
