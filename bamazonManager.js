@@ -103,8 +103,12 @@ function productDisplay(action) {
             case "View Products for Sale":
                 managerPrompt();
                 break;
-            default:
+            case "Add to Inventory":
                 addInventory();
+                break;
+            default:
+                console.log(chalk.red("> Sorry, there was an error. Please try again.\n"));
+                managerPrompt();
         }
     })
 }
@@ -138,28 +142,43 @@ function addInventory() {
     inquirer.prompt([
         {
             type: "number",
-            message: "What is the ID of the product you would like to restock?",
+            message: "Please enter the product ID of which you would like to restock:",
             name: "id",
+            transformer: function(value) {
+                return chalk.cyan(value);
+            },
             validate: function(value) {
                 //if value is a number, if it is an number listed as an id, and if value is a whole number
                 var integerCheck = value % 1;
                 if (!isNaN(value) && value > 0 && value <= itemTotal && integerCheck === 0) {
                     return true;
                 } else {
-                    return false;
+                    return chalk.red("Please enter a valid ID.");
                 }
             }
         }, {
             type: "number",
             message: "How many items would you like to add?",
             name: "quantity",
+            transformer: function(value) {
+                return chalk.cyan(value);
+            },
             validate: function(value) {
                 var integerCheck = value % 1;
-                //if value is a number, if 1 or more items are added, if value is a whole number
-                if (!isNaN(value) && value > 0 && integerCheck === 0) {
-                    return true;
+                //if value is a number
+                if (!isNaN(value)) {
+                    //if 1 or more items are added, if value is a whole number
+                    if (value > 0 && integerCheck === 0) {
+                        return true;
+                    } else if (value <= 0) {
+                        return chalk.red("> Please enter a number greater than zero.");
+                    } else if (integerCheck !== 0) {
+                        return (chalk.red("> Please enter a whole number."));
+                    } else {
+                        return false;
+                    }
                 } else {
-                    return false;
+                    return (chalk.red("> Please enter a valid number."));
                 }
             }
         }
@@ -212,7 +231,7 @@ function newProduct() {
                 if (value !== "") {
                     return true;
                 } else {
-                    return false;
+                    return chalk.red("> Please enter a product.");
                 }
             }
         }, {
@@ -227,6 +246,10 @@ function newProduct() {
                 //if value is not a number and value is not an empty string
                 if (isNaN(value) && value !== "") {
                     return true;
+                } else if (!isNaN(value)) {
+                    return chalk.red("> Please use words only.");
+                } else if (value === "") {
+                    return chalk.red("> Please enter a department.");
                 } else {
                     return false;
                 }
@@ -254,13 +277,13 @@ function newProduct() {
                             return true;
                         } else {
                             //return false if there are more than two decimal points
-                            return false;
+                            return chalk.red("> Please enter a number with two decimal places.");
                         }
                     }
                     //return true if whole number
                     return true;
                 } else {
-                    return false;
+                    return chalk.red("> Please enter a valid price.");
                 }
             }
         }, {
@@ -275,8 +298,12 @@ function newProduct() {
                 var integerCheck = value % 1;
                 if (!isNaN(value) && value > 0 && integerCheck === 0) {
                     return true;
+                } else if (value <= 0) {
+                    return chalk.red("> Please enter a number greater than zero.");
+                } else if (integerCheck !== 0) {
+                    return chalk.red("> Please enter a whole number.");
                 } else {
-                    return false;
+                    return chalk.red("> Please enter a valid number.");
                 }
             }
         }
@@ -364,5 +391,4 @@ function capitalize(value) {
     return newValue.join(" ");
 }
 
-//maybe add an option to remove items from the list
-//prevent users from adding products with the exact same name
+//add update pricing option
