@@ -51,18 +51,14 @@ function productDisplay() {
         itemTotal = response.length;
         //loop through database items for specific values
         for (var i = 0; i < response.length; i++) {
-            //change stock number color to red, yellow, or green according to
-            //whether the items have ran out, are low, or are high in quantity
-            var responseStock = response[i].stock_quantity;
-            if (responseStock === 0) {
-                stockQuantity = chalk.red(responseStock);
-            } else if (responseStock >= 1 && responseStock < 6) {
-                stockQuantity = chalk.yellow(responseStock);
-            } else {
-                stockQuantity = chalk.green(responseStock);
+            var productDisplay = {
+                id: response[i].item_id,
+                name: response[i].product_name,
+                department: response[i].department_name,
+                price: response[i].price,
+                stock: response[i].stock_quantity
             }
-            //database items are pushed into an array to display on a table
-            pushRows(response[i].item_id, response[i].product_name, response[i].department_name, response[i].price, stockQuantity);
+            tableDisplay(productDisplay);
         }
         //create table using the headers and rows
         var table = chalkTable(headers, rows);
@@ -70,6 +66,21 @@ function productDisplay() {
         console.log(`${table}\n`);
         purchasePrompt();
     })
+}
+
+function tableDisplay(product) {
+    //change stock number color to red, yellow, or green according to
+    //whether the items have ran out, are low, or are high in quantity
+    var stock = product.stock;
+    if (stock === 0) {
+        stockQuantity = chalk.red(stock);
+    } else if (stock >= 1 && stock < 6) {
+        stockQuantity = chalk.yellow(stock);
+    } else {
+        stockQuantity = chalk.green(stock);
+    }
+    //database items are pushed into an array to display on a table
+    pushRows(product.id, product.name, product.department, product.price, stockQuantity);
 }
 
 function pushRows(id, product, department, price, stock) {

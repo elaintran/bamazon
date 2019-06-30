@@ -5,8 +5,6 @@ var chalk = require("chalk");
 var chalkTable = require("chalk-table");
 require('dotenv').config();
 //global variables
-var itemTotal;
-var stockQuantity;
 //table
 var headers = {
     columns: [
@@ -81,21 +79,14 @@ function productSales() {
         if (error) throw error;
         row = [];
         for (var i = 0; i < response.length; i++) {
-            var overheadCost = "$" + response[i].over_head_costs;
-            if (response[i].product_sales === null) {
-                var productSales = chalk.yellow("N/A");
-            } else {
-                var productSales = "$" + response[i].product_sales;
+            var departmentDisplay = {
+                id: response[i].department_id,
+                name: response[i].department_name,
+                overhead: response[i].over_head_costs,
+                sales: response[i].product_sales,
+                profit: response[i].total_profit
             }
-            if (response[i].total_profit === null) {
-                var totalProfit = chalk.yellow("N/A");
-            } else if (Math.sign(response[i].total_profit) === -1) {
-                var positiveInt = Math.abs(response[i].total_profit);
-                var totalProfit = chalk.red(`-$${positiveInt}`);
-            } else {
-                var totalProfit = chalk.green(`+$${response[i].total_profit}`);
-            }
-            pushRows(response[i].department_id, response[i].department_name, overheadCost, productSales, totalProfit);
+            tableDisplay(departmentDisplay);
         }
         table = chalkTable(headers, rows);
         //display table on the console
@@ -104,12 +95,37 @@ function productSales() {
     })
 }
 
+function tableDisplay(department) {
+    //if no sales
+    if (department.sales === null) {
+        //change null text to n/a
+        var productSales = chalk.yellow("N/A");
+    //display sales
+    } else {
+        var productSales = "$" + department.sales;
+    }
+    //if no profit
+    if (department.profit === null) {
+        //change null text to n/a
+        var totalProfit = chalk.yellow("N/A");
+    //if negative profit
+    } else if (Math.sign(department.profit) === -1) {
+        //change profit to a positive number and move negative sign to front
+        var positiveInt = Math.abs(department.profit);
+        var totalProfit = chalk.red(`-$${positiveInt}`);
+    //if positive profit, display profit
+    } else {
+        var totalProfit = chalk.green(`+$${department.profit}`);
+    }
+    pushRows(department.id, department.name, department.overhead, productSales, totalProfit);
+}
+
 function pushRows(id, department, overhead, sales, profit) {
     rows.push(
         {
             id: id,
             department: department,
-            overhead: overhead,
+            overhead: "$" + overhead,
             sales: sales,
             profit: profit
         }
