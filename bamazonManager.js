@@ -383,3 +383,4 @@ function capitalize(value) {
 }
 
 //add update pricing option
+//maybe try to add delete product again

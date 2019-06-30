@@ -90,6 +90,9 @@ function purchasePrompt() {
             type: "number",
             message: "What is the ID of the product you would like to purchase?",
             name: "id",
+            transformer: function(value) {
+                return chalk.cyan(value);
+            },
             validate: function(value) {
                 //if value is a number, if it is an number listed as an id, and if value is a whole number
                 var integerCheck = value % 1;
@@ -103,6 +106,9 @@ function purchasePrompt() {
             type: "number",
             message: "How many would you like to purchase?",
             name: "quantity",
+            transformer: function(value) {
+                return chalk.cyan(value);
+            },
             validate: function(value) {
                 var integerCheck = value % 1;
                 //if value is a number, if more than 1 item is purchased, if value is a whole number
