@@ -51,7 +51,7 @@ function supervisorPrompt() {
     ]).then(function(response) {
         switch(response.action) {
             case "View Products Sales by Department":
-                productSales();
+                mergeTables();
                 break;
             case "Create New Department":
                 newDepartment();
@@ -62,3 +62,7 @@ function supervisorPrompt() {
         }
     })
 }
+
+// function mergeTables() {
+//     connection.query("SELECT department_name FROM products INNER JOIN departments")
+// }

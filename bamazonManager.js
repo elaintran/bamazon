@@ -311,18 +311,7 @@ function newProduct() {
         //capitalize first letter in products and department
         var product = capitalize(response.product).trim();
         var department = capitalize(response.department).trim();
-        //check if price is a whole number or decimal
-        var price;
-        var priceString = response.price.toString();
-        var decimalIndex = priceString.indexOf(".");
-        //if decimal
-        if (decimalIndex !== -1) {
-            price = response.price;
-        //add trailing zeros to price as a string and convert to number
-        } else {
-            price = +response.price + ".00";
-        }
-        checkProduct(product, department, price, response.stock);
+        checkProduct(product, department, response.price, response.stock);
     })
 }
 
@@ -382,5 +371,5 @@ function capitalize(value) {
     return newValue.join(" ");
 }
 
-//add update pricing option
-//maybe try to add delete product again
+//when user adds an product in a department not listed,
+//overheadcost = Math.floor(Math.random() * 11) + 1 + "0000"
