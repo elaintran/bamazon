@@ -198,24 +198,7 @@ function updateProduct(id, quantity, totalQuantity, product) {
         if (error) throw error;
         console.log(chalk.green(`> ${quantity} item(s) have been added to ${product}!`));
         console.log(chalk.yellow(`> ${product} now has a total of ${totalQuantity} item(s).\n`));
-        continueAdd();
-    })
-}
-
-function continueAdd() {
-    inquirer.prompt([
-        {
-            type: "confirm",
-            message: "Would you like to add more inventory to another product?",
-            name: "confirm"
-        }
-    ]).then(function(response){
-        if (response.confirm) {
-            addInventory();
-        } else {
-            console.log("");
-            managerPrompt();
-        }
+        managerPrompt();
     })
 }
 
@@ -344,8 +327,6 @@ function addProduct(product, department, price, stock) {
         if (error) throw error;
         console.log(chalk.green(`> Successfully added ${product} to the ${department} department!`));
         console.log(chalk.yellow(`> There are currently ${stock} of these item(s) being sold for $${price}.\n`));
-        //opted out from including another inquirer that prompts if user would like to
-        //add more products because it would take the same time to enter as the managerPrompt
         managerPrompt();
     })
 }
@@ -376,11 +357,34 @@ function deletePrompt() {
         }
     ]).then(function(response) {
         if (response.confirm) {
-            deleteProduct();
+            checkProductName(response.id);
         } else {
             console.log("");
             managerPrompt();
         }
+    })
+}
+
+function checkProductName(id) {
+    connection.query("SELECT * FROM products WHERE ?", [
+        {
+            item_id: id
+        }
+    ], function(error, response) {
+        if (error) throw error;
+        deleteProduct(id, response[0].product_name);
+    })
+}
+
+function deleteProduct(id, product) {
+    connection.query("DELETE FROM products WHERE ?", [
+        {
+            item_id: id
+        }
+    ], function(error, response) {
+        if (error) throw error;
+        console.log(chalk.green(`> Successfully removed ${product} from the store!\n`));
+        managerPrompt();
     })
 }
 
@@ -409,3 +413,4 @@ function capitalize(value) {
 }
 
 //maybe add an option to remove items from the list
+//prevent users from adding products with the exact same name
