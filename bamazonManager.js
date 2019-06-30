@@ -46,8 +46,7 @@ function managerPrompt() {
             type: "list",
             message: "What type of action would you like to perform?",
             choices: ["View Products for Sale", "View Low Inventory", "Add to Inventory",
-                      "Add New Product", "Exit"],
-                      //remove existing product
+                      "Add New Product", "Remove Existing Product", "Exit"],
             name: "action"
         }
     ]).then(function(response) {
@@ -347,63 +346,80 @@ function addProduct(product, department, price, stock) {
     })
 }
 
-//delete product on hold due to issue with primary key
-// function deletePrompt() {
-//     inquirer.prompt([
-//         {
-//             type: "number",
-//             message: "What is the ID of the product you would like to remove?",
-//             name: "id",
-//             transformer: function(value) {
-//                 return chalk.cyan(value);
-//             },
-//             validate: function(value) {
-//                 //if value is a number, if it is an number listed as an id, and if value is a whole number
-//                 var integerCheck = value % 1;
-//                 if (!isNaN(value) && value > 0 && value <= itemTotal && integerCheck === 0) {
-//                     return true;
-//                 } else {
-//                     return false;
-//                 }
-//             }
-//         }, {
-//             type: "confirm",
-//             message: "Are you sure?",
-//             name: "confirm",
-//             default: false
-//         }
-//     ]).then(function(response) {
-//         if (response.confirm) {
-//             checkId(response.id);
-//         } else {
-//             console.log("");
-//             managerPrompt();
-//         }
-//     })
-// }
+ //delete product on hold due to issue with id increments
+function deletePrompt() {
+    inquirer.prompt([
+        {
+            type: "number",
+            message: "What is the ID of the product you would like to remove?",
+            name: "id",
+            transformer: function(value) {
+                return chalk.cyan(value);
+            },
+            validate: function(value) {
+                //if value is a number, if it is an number listed as an id, and if value is a whole number
+                var integerCheck = value % 1;
+                if (!isNaN(value) && value > 0 && value <= itemTotal && integerCheck === 0) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        }, {
+            type: "confirm",
+            message: "Are you sure?",
+            name: "confirm",
+            default: false
+        }
+    ]).then(function(response) {
+        if (response.confirm) {
+            checkId(response.id);
+        } else {
+            console.log("");
+            managerPrompt();
+        }
+    })
+}
 
-// function checkId(id) {
-//     connection.query("SELECT * FROM products WHERE ?", [
-//         {
-//             item_id: id
-//         }
-//     ], function(error, response) {
-//         if (error) throw error;
-//         deleteProduct(id, response[0].product_name);
-//     })
-// }
+function checkId(id) {
+    connection.query("SELECT * FROM products WHERE ?", [
+        {
+            item_id: id
+        }
+    ], function(error, response) {
+        if (error) throw error;
+        deleteProduct(id, response[0].product_name);
+    })
+}
 
-// function deleteProduct(id, product) {
-//     connection.query("DELETE FROM products WHERE ?", [
-//         {
-//             item_id: id
-//         }
-//     ], function(error, response) {
-//         if (error) throw error;
-//         console.log(chalk.green(`> Successfully removed ${product} from the store!\n`));
-//         managerPrompt();
-//     })
-// }
+function deleteProduct(id, product) {
+    connection.query("DELETE FROM products WHERE ?", [
+        {
+            item_id: id
+        }
+    ], function(error, response) {
+        if (error) throw error;
+        console.log(chalk.green(`> Successfully removed ${product} from the store!\n`));
+        checkMaxId(id);
+    })
+}
+
+function checkMaxId() {
+    connection.query("SELECT MAX(item_id) FROM products;", function(error, response) {
+        if (error) throw error;
+        //dot method did not work so had to parse data using an array
+        var maxId = response[0]["MAX(item_id)"];
+        resetIncrements(maxId);
+    })
+}
+
+function resetIncrements(maxId) {
+    var number = +maxId + 1;
+    connection.query("ALTER TABLE products AUTO_INCREMENT=" + number + ";", function(error, response) {
+        if (error) throw (error);
+        managerPrompt();
+    })
+}
 
 function pushRows(id, product, department, price, stock) {
     rows.push(
