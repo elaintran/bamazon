@@ -269,19 +269,19 @@ function newProduct() {
                     var decimalIndex = valueString.indexOf(".");
                     //if value has a decimal
                     if (decimalIndex !== -1) {
-                        //get values first the first and second number after the decimal
-                        // var pointOne = valueString.substring(decimalIndex + 1, decimalIndex + 3);
+                        //get numbers after the trailing decimal point
                         var pointTwo = valueString.substring(decimalIndex + 1, decimalIndex + 4);
-                        //if value has one or two decimal points
+                        //if value has two decimal points
                         if (pointTwo.length === 2) {
                             return true;
                         } else {
-                            //return false if there are more than two decimal points
+                            //return false if there is one decimal or more than two decimal points
                             return chalk.red("Please enter a number with two decimal places.");
                         }
                     }
                     //return true if whole number
                     return true;
+                //if value is a string
                 } else {
                     return chalk.red("Please enter a valid price.");
                 }
@@ -317,19 +317,10 @@ function newProduct() {
         var decimalIndex = priceString.indexOf(".");
         //if decimal
         if (decimalIndex !== -1) {
-            //check how many decimal places
-            var decimalLength = priceString.substring(decimalIndex + 1, decimalIndex + 4);
-            //if one decimal place
-            if (decimalLength.length === 1) {
-                //add a 0 to the end
-                price = +response.price + "0";
-            //print value with two decimal places
-            } else {
-                price = response.price;
-            }
-        //print whole number value
-        } else {
             price = response.price;
+        //add trailing zeros to price as a string and convert to number
+        } else {
+            price = +response.price + ".00";
         }
         checkProduct(product, department, price, response.stock);
     })
