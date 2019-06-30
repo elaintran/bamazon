@@ -171,14 +171,14 @@ function addInventory() {
                     if (value > 0 && integerCheck === 0) {
                         return true;
                     } else if (value <= 0) {
-                        return chalk.red("> Please enter a number greater than zero.");
+                        return chalk.red("Please enter a number greater than zero.");
                     } else if (integerCheck !== 0) {
-                        return (chalk.red("> Please enter a whole number."));
+                        return (chalk.red("Please enter a whole number."));
                     } else {
                         return false;
                     }
                 } else {
-                    return (chalk.red("> Please enter a valid number."));
+                    return (chalk.red("Please enter a valid number."));
                 }
             }
         }
@@ -231,7 +231,7 @@ function newProduct() {
                 if (value !== "") {
                     return true;
                 } else {
-                    return chalk.red("> Please enter a product.");
+                    return chalk.red("Please enter a product.");
                 }
             }
         }, {
@@ -247,16 +247,16 @@ function newProduct() {
                 if (isNaN(value) && value !== "") {
                     return true;
                 } else if (!isNaN(value)) {
-                    return chalk.red("> Please use words only.");
+                    return chalk.red("Please use words only.");
                 } else if (value === "") {
-                    return chalk.red("> Please enter a department.");
+                    return chalk.red("Please enter a department.");
                 } else {
                     return false;
                 }
             }
         }, {
             type: "number",
-            message: "What is the selling price?",
+            message: "How much would you like to sell it for?",
             name: "price",
             transformer: function(value) {
                 return chalk.cyan(value);
@@ -270,20 +270,20 @@ function newProduct() {
                     //if value has a decimal
                     if (decimalIndex !== -1) {
                         //get values first the first and second number after the decimal
-                        var pointOne = valueString.substring(decimalIndex + 1, decimalIndex + 3);
+                        // var pointOne = valueString.substring(decimalIndex + 1, decimalIndex + 3);
                         var pointTwo = valueString.substring(decimalIndex + 1, decimalIndex + 4);
                         //if value has one or two decimal points
-                        if(pointOne.length === 1 || pointTwo.length === 2) {
+                        if (pointTwo.length === 2) {
                             return true;
                         } else {
                             //return false if there are more than two decimal points
-                            return chalk.red("> Please enter a number with two decimal places.");
+                            return chalk.red("Please enter a number with two decimal places.");
                         }
                     }
                     //return true if whole number
                     return true;
                 } else {
-                    return chalk.red("> Please enter a valid price.");
+                    return chalk.red("Please enter a valid price.");
                 }
             }
         }, {
