@@ -282,10 +282,13 @@ function newProduct() {
             type: "number",
             message: "How many are in stock?",
             name: "stock",
+            transformer: function(value) {
+                return chalk.cyan(value);
+            },
             validate: function(value) {
                 //return whole numbers only
                 var integerCheck = value % 1;
-                if (!isNaN(value) && integerCheck === 0) {
+                if (!isNaN(value) && value > 0 && integerCheck === 0) {
                     return true;
                 } else {
                     return false;
@@ -316,16 +319,27 @@ function newProduct() {
         } else {
             price = response.price;
         }
-        console.log(price);
-        // addProduct(product, department, );
-        //console.log(response);
-        connection.end();
-        // managerPrompt();
+        addProduct(product, department, price, response.stock);
+        // connection.end();
     })
 }
 
-function addProduct() {
-
+function addProduct(product, department, price, stock) {
+    connection.query("INSERT INTO products SET ?", [
+        {
+            product_name: product,
+            department_name: department,
+            price: price,
+            stock_quantity: stock
+        }
+    ], function(error, response) {
+        if (error) throw error;
+        console.log(chalk.green(`> Successfully added ${product} to the ${department} department!`));
+        console.log(chalk.yellow(`> There are currently ${stock} of these item(s) being sold for $${price}.\n`));
+        //opted out from including another inquirer that prompts if user would like to
+        //add more products because it would take the same time to enter as the managerPrompt
+        managerPrompt();
+    })
 }
 
 function pushRows(id, product, department, price, stock) {
