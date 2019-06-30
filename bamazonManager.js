@@ -259,7 +259,7 @@ function newProduct() {
             },
             validate: function(value) {
                 //if value is a number
-                if (!isNaN(value)) {
+                if (!isNaN(value) && value > 0) {
                     //convert value into string to find decimal point and use substring
                     var valueString = value.toString();
                     var decimalIndex = valueString.indexOf(".");
@@ -295,11 +295,9 @@ function newProduct() {
                 if (!isNaN(value) && value > 0 && integerCheck === 0) {
                     return true;
                 } else if (value <= 0) {
-                    return chalk.red("> Please enter a number greater than zero.");
+                    return chalk.red("Please enter a valid number.");
                 } else if (integerCheck !== 0) {
-                    return chalk.red("> Please enter a whole number.");
-                } else {
-                    return chalk.red("> Please enter a valid number.");
+                    return chalk.red("Please enter a whole number.");
                 }
             }
         }

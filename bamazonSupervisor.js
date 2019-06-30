@@ -101,15 +101,50 @@ function newDepartment() {
         {
             type: "input",
             message: "What department would you like to add?",
-            name: "department"
+            name: "department",
+            transformer: function(value) {
+                var input = capitalize(value);
+                return chalk.cyan(input);
+            },
+            validate: function(value) {
+                //if value is not a number and value is not an empty string
+                if (isNaN(value) && value !== "") {
+                    return true;
+                } else if (!isNaN(value)) {
+                    return chalk.red("Please use words only.");
+                } else if (value === "") {
+                    return chalk.red("Please enter a department.");
+                } else {
+                    return false;
+                }
+            }
         }, {
             type: "number",
             message: "What are the overhead costs?",
-            name: "overhead"
+            name: "overhead",
+            transformer: function(value) {
+                return chalk.cyan(value);
+            },
+            validate: function(value) {
+                //if value is a number
+                if (!isNaN(value) && value > 0) {
+                    //convert value into string to find decimal point and use substring
+                    var valueString = value.toString();
+                    var decimalIndex = valueString.indexOf(".");
+                    //if value has a decimal
+                    if (decimalIndex !== -1) {
+                        return chalk.red("Please enter a whole number.");
+                    }
+                    return true;
+                //if value is a string
+                } else {
+                    return chalk.red("Please enter a valid cost.");
+                }
+            }
         }
     ]).then(function(response) {
-        // console.log(response.department + " " + response.overhead);
-        checkDepartment(response.department, response.overhead);
+        var department = capitalize(response.department).trim();
+        checkDepartment(department, response.overhead);
     })
 }
 
@@ -177,4 +212,16 @@ function pushRows(id, department, overhead, sales, profit) {
             profit: profit
         }
     );
+}
+
+function capitalize(value) {
+    var valueArr = value.toLowerCase().split(" ");
+    //initially used an empty string, but results in choppy typing movement
+    //on the command line
+    var newValue = [];
+        for (var i = 0; i < valueArr.length; i++) {
+            var capitalize = valueArr[i].charAt(0).toUpperCase() + valueArr[i].slice(1);
+            newValue.push(capitalize);
+        }
+    return newValue.join(" ");
 }
