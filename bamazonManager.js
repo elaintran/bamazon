@@ -142,7 +142,7 @@ function addInventory() {
     inquirer.prompt([
         {
             type: "number",
-            message: "Please enter the product ID of which you would like to restock:",
+            message: "What is the ID of the product you would like to restock?",
             name: "id",
             transformer: function(value) {
                 return chalk.cyan(value);
@@ -219,7 +219,7 @@ function newProduct() {
     inquirer.prompt([
         {
             type: "input",
-            message: "What product would you like to add?",
+            message: "What product do you would you like to add?",
             name: "product",
             transformer: function(value) {
                 //capitalize the first letter of every word

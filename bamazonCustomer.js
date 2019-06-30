@@ -96,7 +96,7 @@ function purchasePrompt() {
                 if (!isNaN(value) && value > 0 && value <= itemTotal && integerCheck === 0) {
                     return true;
                 } else {
-                    return false;
+                    return chalk.red("Please enter a valid ID.");
                 }
             }
         }, {
@@ -106,10 +106,19 @@ function purchasePrompt() {
             validate: function(value) {
                 var integerCheck = value % 1;
                 //if value is a number, if more than 1 item is purchased, if value is a whole number
-                if (!isNaN(value) && value > 0 && integerCheck === 0) {
-                    return true;
+                if (!isNaN(value)) {
+                    //if 1 or more items are added, if value is a whole number
+                    if (value > 0 && integerCheck === 0) {
+                        return true;
+                    } else if (value <= 0) {
+                        return chalk.red("> Please enter a number greater than zero.");
+                    } else if (integerCheck !== 0) {
+                        return (chalk.red("> Please enter a whole number."));
+                    } else {
+                        return false;
+                    }
                 } else {
-                    return false;
+                    return (chalk.red("> Please enter a valid number."));
                 }
             }
         }
