@@ -90,7 +90,8 @@ function productSales() {
             if (response[i].total_profit === null) {
                 var totalProfit = chalk.yellow("N/A");
             } else if (Math.sign(response[i].total_profit) === -1) {
-                var totalProfit = chalk.red(`$${response[i].total_profit}`);
+                var positiveInt = Math.abs(response[i].total_profit);
+                var totalProfit = chalk.red(`-$${positiveInt}`);
             } else {
                 var totalProfit = chalk.green(`$${response[i].total_profit}`);
             }
