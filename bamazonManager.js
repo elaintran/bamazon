@@ -110,17 +110,22 @@ function productDisplay(action) {
 function lowInventory() {
     connection.query("SELECT * FROM products", function(error, response) {
         if (error) throw error;
+        //clear row
         rows = [];
         for (var i = 0; i < response.length; i++) {
+            //if stock is 5 or less
             if (response[i].stock_quantity < 6) {
+                //if out of stock, display red
                 if (response[i].stock_quantity === 0) {
                     var lowStock = chalk.red(response[i].stock_quantity);
+                //if low stock, display yellow
                 } else {
                     var lowStock = chalk.yellow(response[i].stock_quantity);
                 }
                 pushRows(response[i].item_id, response[i].product_name, response[i].department_name, response[i].price, lowStock);
             }
         }
+        //update table
         table = chalkTable(headers, rows);
         console.log("\n" + table + "\n");
         managerPrompt();
@@ -161,6 +166,7 @@ function addInventory() {
     })
 }
 
+//check quantity of product before adding additional items
 function checkProduct(id, quantity) {
     connection.query("SELECT * FROM products WHERE ?", [
         {
@@ -211,11 +217,10 @@ function newProduct() {
             type: "input",
             message: "What product would you like to add?",
             name: "product",
-            //capitalize the first letter of every word
-            //does not affect actual value, so need to capitalize again
             transformer: function(value) {
+                //capitalize the first letter of every word
                 var input = capitalize(value);
-                return input;
+                return chalk.cyan(input);
             },
             validate: function(value) {
                 //if value is not an empty string
@@ -231,7 +236,7 @@ function newProduct() {
             name: "department",
             transformer: function(value) {
                 var input = capitalize(value);
-                return input;
+                return chalk.cyan(input);
             },
             validate: function(value) {
                 //if value is not a number and value is not an empty string
@@ -242,7 +247,6 @@ function newProduct() {
                 }
             }
         }, {
-            //need to determine how to allow decimals up to 2 spaces
             type: "number",
             message: "What is the selling price?",
             name: "price",
@@ -254,12 +258,12 @@ function newProduct() {
                 if (!isNaN(value)) {
                     //convert value into string to find decimal point and use substring
                     var valueString = value.toString();
-                    var decimalCheck = valueString.indexOf(".");
+                    var decimalIndex = valueString.indexOf(".");
                     //if value has a decimal
-                    if (decimalCheck !== -1) {
+                    if (decimalIndex !== -1) {
                         //get values first the first and second number after the decimal
-                        var pointOne = valueString.substring(decimalCheck + 1, decimalCheck + 3);
-                        var pointTwo = valueString.substring(decimalCheck + 1, decimalCheck + 4);
+                        var pointOne = valueString.substring(decimalIndex + 1, decimalIndex + 3);
+                        var pointTwo = valueString.substring(decimalIndex + 1, decimalIndex + 4);
                         //if value has one or two decimal points
                         if(pointOne.length === 1 || pointTwo.length === 2) {
                             return true;
@@ -275,11 +279,11 @@ function newProduct() {
                 }
             }
         }, {
-            //allow only whole numbers
             type: "number",
             message: "How many are in stock?",
             name: "stock",
             validate: function(value) {
+                //return whole numbers only
                 var integerCheck = value % 1;
                 if (!isNaN(value) && integerCheck === 0) {
                     return true;
@@ -289,10 +293,39 @@ function newProduct() {
             }
         }
     ]).then(function(response) {
-        console.log(response);
+        //capitalize first letter in products and department
+        var product = capitalize(response.product);
+        var department = capitalize(response.department);
+        //check if price is a whole number or decimal
+        var price;
+        var priceString = response.price.toString();
+        var decimalIndex = priceString.indexOf(".");
+        //if decimal
+        if (decimalIndex !== -1) {
+            //check how many decimal places
+            var decimalLength = priceString.substring(decimalIndex + 1, decimalIndex + 4);
+            //if one decimal place
+            if (decimalLength.length === 1) {
+                //add a 0 to the end
+                price = +response.price + "0";
+            //print value with two decimal places
+            } else {
+                price = response.price;
+            }
+        //print whole number value
+        } else {
+            price = response.price;
+        }
+        console.log(price);
+        // addProduct(product, department, );
+        //console.log(response);
         connection.end();
         // managerPrompt();
     })
+}
+
+function addProduct() {
+
 }
 
 function pushRows(id, product, department, price, stock) {
@@ -316,7 +349,7 @@ function capitalize(value) {
             var capitalize = valueArr[i].charAt(0).toUpperCase() + valueArr[i].slice(1);
             newValue.push(capitalize);
         }
-    return chalk.cyan(newValue.join(" "));
+    return newValue.join(" ");
 }
 
 //maybe add an option to remove items from the list
