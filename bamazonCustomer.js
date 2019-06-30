@@ -143,6 +143,7 @@ function purchaseProducts(id, quantity) {
         if (error) throw error;
         //check if there is enough quantity
         var totalStock = response[0].stock_quantity - quantity;
+        var productSales = response[0].product_sales;
         //if totalStock is a negative number
         if (totalStock < 0) {
             console.log(chalk.red("> Sorry, there aren't enough items! Please try again.\n"));
@@ -152,20 +153,22 @@ function purchaseProducts(id, quantity) {
         } else {
             //total of the current purchase
             var totalPrice = quantity * response[0].price;
+            var totalSales = productSales + totalPrice;
             //total of all purchases
             amountSpent += totalPrice;
             //update database
-            updateTable(id, totalStock, quantity, totalPrice);
+            updateTable(id, totalStock, quantity, totalPrice, totalSales);
         }
     })
 }
 
-function updateTable(id, totalStock, totalQuantity, totalPrice) {
+function updateTable(id, totalStock, totalQuantity, totalPrice, totalSales) {
     //use the id to update the stock in the database
     connection.query("UPDATE products SET ? WHERE ?",
     [
         {
-            stock_quantity: totalStock
+            stock_quantity: totalStock,
+            product_sales: totalSales
         }, {
             item_id: id
         }

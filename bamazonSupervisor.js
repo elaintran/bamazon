@@ -11,10 +11,10 @@ var stockQuantity;
 var headers = {
     columns: [
         { field: "id", name: "ID" },
-        { field: "product", name: "Product" },
-        { field: "department", name: "Department" },
-        { field: "price", name: "Price" },
-        { field: "stock", name: "Stock" }
+        { field: "product", name: "Department" },
+        { field: "department", name: "Overhead Costs" },
+        { field: "price", name: "Product Sales" },
+        { field: "stock", name: "Total Profit" }
     ]
 };
 var rows = [];
@@ -40,7 +40,7 @@ connection.connect(function(error) {
     supervisorPrompt();
 })
 
-function managerPrompt() {
+function supervisorPrompt() {
     inquirer.prompt([
         {
             type: "list",
