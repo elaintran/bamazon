@@ -82,17 +82,17 @@ function productSales() {
         row = [];
         for (var i = 0; i < response.length; i++) {
             var overheadCost = "$" + response[i].over_head_costs;
-            if (response[0].product_sales === null) {
+            if (response[i].product_sales === null) {
                 var productSales = chalk.yellow("N/A");
             } else {
-                var productSales = "$" + response[0].product_sales;
+                var productSales = "$" + response[i].product_sales;
             }
-            if (response[0].total_profit === null) {
+            if (response[i].total_profit === null) {
                 var totalProfit = chalk.yellow("N/A");
-            } else if (Math.sign(response[0].total_profit) === -1) {
-                var totalProfit = chalk.red(`$${response[0].total_profit}`);
+            } else if (Math.sign(response[i].total_profit) === -1) {
+                var totalProfit = chalk.red(`$${response[i].total_profit}`);
             } else {
-                var totalProfit = chalk.green(`$${response[0].total_profit}`);
+                var totalProfit = chalk.green(`$${response[i].total_profit}`);
             }
             pushRows(response[i].department_id, response[i].department_name, overheadCost, productSales, totalProfit);
         }
