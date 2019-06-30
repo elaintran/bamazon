@@ -93,7 +93,7 @@ function productSales() {
                 var positiveInt = Math.abs(response[i].total_profit);
                 var totalProfit = chalk.red(`-$${positiveInt}`);
             } else {
-                var totalProfit = chalk.green(`$${response[i].total_profit}`);
+                var totalProfit = chalk.green(`+$${response[i].total_profit}`);
             }
             pushRows(response[i].department_id, response[i].department_name, overheadCost, productSales, totalProfit);
         }
