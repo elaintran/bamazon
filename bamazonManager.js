@@ -241,7 +241,7 @@ function newProduct() {
             }
         }, {
             type: "number",
-            message: "How much would you like add to the stock?",
+            message: "How many would you like to add?",
             name: "stock",
             transformer: function(value) {
                 return chalk.cyan(value);
@@ -319,7 +319,7 @@ function addProduct(product, department, price, stock) {
     ], function(error, response) {
         if (error) throw error;
         console.log(chalk`{green > Successfully added ${product} to the ${department} department!}
-{yellow > There are currently ${stock} of these item(s) being sold for $${price}.\n}`);
+{yellow > Currently ${stock} item(s) in stock and selling for $${price} each.\n}`);
         managerPrompt();
     })
 }
