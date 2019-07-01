@@ -64,15 +64,16 @@ function supervisorPrompt() {
 
 function productSales() {
     //pass department_id, department_name, and overhead cost as table columns
-    var selectQuery = "SELECT department_id, departments.department_name, over_head_costs, " +
     //department name has the table name infront to specify which header to use
+    var selectQuery = "SELECT department_id, departments.department_name, over_head_costs, " +
     //using alias to rename product_sales and total_profit
     //if no alias is used, the default name is passed as a header
     "SUM(product_sales) AS product_sales " +
     //departments is the left table
     "FROM departments " +
     //join by department names
-    //need to left join because departments won't display if using inner join
+    //need to left join because departments won't display if newly created and
+    //no products are listed when using inner join
     "LEFT JOIN products ON products.department_name = departments.department_name " +
     //merge all of the departments by same name together
     "GROUP BY department_name;";
@@ -195,13 +196,15 @@ function tableDisplay(department) {
     } else {
         var productSales = "$" + department.sales;
     }
+    //get profit by subtracting product sales from the overhead cost
+    //profit is not stored in the database
     var profit = department.sales - department.overhead;
     //if negative profit
     if (Math.sign(profit) === -1) {
         //change profit to a positive number and move negative sign to front
         var positiveInt = Math.abs(profit);
         var totalProfit = chalk.red(`-$${positiveInt}`);
-    //if positive profit, display profit
+    //if positive profit
     } else {
         var totalProfit = chalk.green(`+$${profit}`);
     }
