@@ -136,11 +136,11 @@ function newDepartment() {
                         return chalk.red("Please enter a whole number.");
                     }
                     //keep overhead cost at a believable amount
-                    if (value >= 1000 && value <= 15000) {
+                    if (value >= 1000 && value <= 150000) {
                         return true;
                     } else if (value < 1000) {
                         return chalk.red("The overhead cost should be at least $1000. Please try again.");
-                    } else if (value > 15000) {
+                    } else if (value > 150000) {
                         return chalk.red("The overhead cost limit is $150000. Please try again.");
                     }
                 //if value is a string
