@@ -56,7 +56,7 @@ function supervisorPrompt() {
                 newDepartment();
                 break;
             default:
-                console.log(chalk.yellow("> Thanks again!\n"));
+                console.log(chalk.yellow("> Thanks again!"));
                 connection.end();
         }
     })
@@ -64,12 +64,11 @@ function supervisorPrompt() {
 
 function productSales() {
     //pass department_id, department_name, and overhead cost as table columns
-    var selectQuery = "SELECT department_id, departments.department_name, over_head_costs," +
+    var selectQuery = "SELECT department_id, departments.department_name, over_head_costs, " +
     //department name has the table name infront to specify which header to use
     //using alias to rename product_sales and total_profit
     //if no alias is used, the default name is passed as a header
-    "SUM(product_sales) AS product_sales," +
-    "product_sales - over_head_costs AS total_profit " +
+    "SUM(product_sales) AS product_sales " +
     //departments is the left table
     "FROM departments " +
     //join by department names
@@ -79,14 +78,13 @@ function productSales() {
     "GROUP BY department_name;";
     connection.query(selectQuery, function(error, response) {
         if (error) throw error;
-        row = [];
+        rows = [];
         for (var i = 0; i < response.length; i++) {
             var departmentDisplay = {
                 id: response[i].department_id,
                 name: response[i].department_name,
                 overhead: response[i].over_head_costs,
-                sales: response[i].product_sales,
-                profit: response[i].total_profit
+                sales: response[i].product_sales
             }
             tableDisplay(departmentDisplay);
         }
@@ -142,7 +140,7 @@ function newDepartment() {
                         return true;
                     } else if (value < 1000) {
                         return chalk.red("The overhead cost should be at least $1000. Please try again.");
-                    } else {
+                    } else if (value > 15000) {
                         return chalk.red("The overhead cost limit is $150000. Please try again.");
                     }
                 //if value is a string
@@ -197,17 +195,15 @@ function tableDisplay(department) {
     } else {
         var productSales = "$" + department.sales;
     }
-    //if no profit
-    if (department.profit === null) {
-        var totalProfit = chalk.yellow("N/A");
+    var profit = department.sales - department.overhead;
     //if negative profit
-    } else if (Math.sign(department.profit) === -1) {
+    if (Math.sign(profit) === -1) {
         //change profit to a positive number and move negative sign to front
-        var positiveInt = Math.abs(department.profit);
+        var positiveInt = Math.abs(profit);
         var totalProfit = chalk.red(`-$${positiveInt}`);
     //if positive profit, display profit
     } else {
-        var totalProfit = chalk.green(`+$${department.profit}`);
+        var totalProfit = chalk.green(`+$${profit}`);
     }
     pushRows(department.id, department.name, department.overhead, productSales, totalProfit);
 }

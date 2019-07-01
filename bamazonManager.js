@@ -64,7 +64,7 @@ function managerPrompt() {
                 newProduct();
                 break;
             default:
-                console.log(chalk.yellow("> Thanks again!\n"));
+                console.log(chalk.yellow("> Thanks again!"));
                 connection.end();
         }
     })

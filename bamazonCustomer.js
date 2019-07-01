@@ -210,7 +210,7 @@ function continuePurchasePrompt() {
             console.log("");
             productDisplay();
         } else {
-            console.log(chalk.yellow("> Thank you for stopping by!\n"));
+            console.log(chalk.yellow("> Thank you for stopping by!"));
             connection.end();
         }
     })
