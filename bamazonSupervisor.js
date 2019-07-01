@@ -47,6 +47,7 @@ function supervisorPrompt() {
             name: "action"
         }
     ]).then(function(response) {
+        //perform action
         switch(response.action) {
             case "View Product Sales by Department":
                 productSales();
@@ -107,11 +108,13 @@ function newDepartment() {
                 return chalk.cyan(input);
             },
             validate: function(value) {
-                //if value is not a number and value is not an empty string
+                //if value is a string and not empty
                 if (isNaN(value) && value !== "") {
                     return true;
+                //if value is a number
                 } else if (!isNaN(value)) {
                     return chalk.red("Please use words only.");
+                //if value is an empty string
                 } else if (value === "") {
                     return chalk.red("Please enter a department.");
                 } else {
@@ -126,8 +129,9 @@ function newDepartment() {
                 return chalk.cyan(value);
             },
             validate: function(value) {
+                //check if value is a decimal
                 var integerCheck = value % 1;
-                //if value is a number
+                //if value is a number and has a value of 1 or more
                 if (!isNaN(value) && value > 0) {
                     //if value has a decimal
                     if (integerCheck !== 0) {
@@ -137,9 +141,9 @@ function newDepartment() {
                     if (value >= 1000 && value <= 15000) {
                         return true;
                     } else if (value < 1000) {
-                        return chalk.red("Please enter a cost greater than 999.");
+                        return chalk.red("The overhead cost should be at least $1000. Please try again.");
                     } else {
-                        return chalk.red("Please enter a cost less than 150000.");
+                        return chalk.red("The overhead cost limit is $150000. Please try again.");
                     }
                 //if value is a string
                 } else {
@@ -160,8 +164,11 @@ function checkDepartment(department, overhead) {
         }
     ], function(error, response) {
         if (error) throw error;
+        //if department has not been added yet
         if (response.length === 0) {
+            //add department
             addDepartment(department, overhead);
+        //if department exists
         } else {
             console.log(chalk.red(`> ${department} already exists. Please try again.\n`));
             newDepartment();
@@ -185,7 +192,6 @@ function addDepartment(department, overhead) {
 function tableDisplay(department) {
     //if no sales
     if (department.sales === null) {
-        //change null text to n/a
         var productSales = chalk.yellow("N/A");
     //display sales
     } else {
@@ -193,7 +199,6 @@ function tableDisplay(department) {
     }
     //if no profit
     if (department.profit === null) {
-        //change null text to n/a
         var totalProfit = chalk.yellow("N/A");
     //if negative profit
     } else if (Math.sign(department.profit) === -1) {
@@ -225,6 +230,7 @@ function capitalize(value) {
     //on the command line
     var newValue = [];
         for (var i = 0; i < valueArr.length; i++) {
+            //capitalize the first letter and add the rest of the string
             var capitalize = valueArr[i].charAt(0).toUpperCase() + valueArr[i].slice(1);
             newValue.push(capitalize);
         }

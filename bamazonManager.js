@@ -358,6 +358,7 @@ function capitalize(value) {
     //on the command line
     var newValue = [];
         for (var i = 0; i < valueArr.length; i++) {
+            //capitalize the first letter and add the rest of the string
             var capitalize = valueArr[i].charAt(0).toUpperCase() + valueArr[i].slice(1);
             newValue.push(capitalize);
         }
@@ -382,27 +383,21 @@ function inputRestrict(value, type) {
 function validateQuantity(value) {
     //check if value is a decimal
     var integerCheck = value % 1;
-    //convert value to string to find the length
-    var valueString = value.toString();
     //if value is a number
     if (!isNaN(value)) {
-        //extra security to prevent mysql errors if user inputs an out of range number
-        if (valueString.length <= 7) {
-            //if items added is between 1 and 2000, if value is a whole number
-            if (value > 0 && value < 2001 && integerCheck === 0) {
-                return true;
-            //if value is 0 or a negative number
-            } else if (value <= 0) {
-                return chalk.red("Please enter a valid number.");
-            //if user enters a value more than what is accepted
-            } else if (value > 2000) {
-                return chalk.red("The stock limit is 2000. Please try again.");
-            //if value is a decimal
-            } else if (integerCheck !== 0) {
-                return (chalk.red("Please enter a whole number."));
-            }
-        } else {
-            return (chalk.red("The stock limit is 2000. Please try again."));
+        //if value is a whole number
+        if (integerCheck !== 0) {
+            return chalk.red("Please enter a whole number.");
+        }
+        //if items added is between 1 and 2000
+        if (value > 0 && value < 2001) {
+            return true;
+        //if value is 0 or a negative number
+        } else if (value <= 0) {
+            return chalk.red("Please enter a valid number.");
+        //if user enters a value more than what is accepted
+        } else if (value > 2000) {
+            return chalk.red("The stock limit is 2000. Please try again.");
         }
     } else {
         return (chalk.red("Please enter a valid number."));
@@ -414,30 +409,27 @@ function validatePrice(value) {
     var valueString = value.toString();
     var decimalIndex = valueString.indexOf(".");
     //if value is a number and is one or more
-    if (!isNaN(value) && value > 0) {
-        //security measure to prevent out of range answers
-        if (valueString.length <= 9) {
-            //if value has a decimal
-            if (decimalIndex !== -1) {
-                //get cent value
-                var cents = valueString.substring(decimalIndex + 1, decimalIndex + 4);
-                //if value has two decimal points
-                if (cents.length === 2) {
-                    return true;
-                //return false if there is one decimal or more than two decimal points
-                } else {
-                    return chalk.red("Please enter a price with two decimal places.");
-                }
-            }
-            //limit value to $2000
-            if (value > 2000) {
-                return chalk.red("The price limit is $2000. Please try again.");
-            //return true if whole number less than $2001
-            } else {
+    if (!isNaN(value)) {
+        //if value has a decimal
+        if (decimalIndex !== -1) {
+            //get cent value
+            var cents = valueString.substring(decimalIndex + 1, decimalIndex + 4);
+            //if value has two decimal points
+            if (cents.length === 2) {
                 return true;
+            //return false if there is one decimal or more than two decimal points
+            } else {
+                return chalk.red("Please enter a price with two decimal places.");
             }
-        } else {
-            return (chalk.red("The price limit is $2000. Please try again."));
+        }
+        //if value is within the price range
+        if (value > 0 && value <= 2000) {
+            return true;
+        //if value is outside the price range
+        } else if (value <= 0) {
+            return chalk.red("Please enter a valid price.");
+        } else if (value > 2000) {
+            return chalk.red("The price limit is $2000. Please try again.");
         }
     //if value is a string
     } else {
