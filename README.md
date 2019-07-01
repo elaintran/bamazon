@@ -2,6 +2,11 @@
 Bamazon is a storefront CLI application that utilizes MySQL for product sales and inventory management. Features include purchasing items, keeping tabs on inventory, adding new products, and tracking sales across departments.
 
 ## Install
+Clone the repository onto your system.
+```
+git clone https://github.com/elaintran/bamazon.git
+```
+Install the node packages.
 ```
 npm install
 ```
