@@ -67,13 +67,14 @@ function productDisplay() {
 }
 
 function tableDisplay(product) {
-    //change stock number color to red, yellow, or green according to
-    //whether the items have ran out, are low, or are high in quantity
     var stock = product.stock;
+    //red text if out of stock
     if (stock === 0) {
         stockQuantity = chalk.red(stock);
+    //yellow text if low stock
     } else if (stock >= 1 && stock < 6) {
         stockQuantity = chalk.yellow(stock);
+    //green text if high in quantity
     } else {
         stockQuantity = chalk.green(stock);
     }
@@ -103,8 +104,9 @@ function purchasePrompt() {
                 return chalk.cyan(value);
             },
             validate: function(value) {
-                //if value is a number, if it is an number listed as an id, and if value is a whole number
+                //check if value is a decimal
                 var integerCheck = value % 1;
+                //if value is a number, if it is an number listed as an id, and if value is a whole number
                 if (!isNaN(value) && value > 0 && value <= itemTotal && integerCheck === 0) {
                     return true;
                 } else {
@@ -119,19 +121,21 @@ function purchasePrompt() {
                 return chalk.cyan(value);
             },
             validate: function(value) {
+                //check if value is a decimal
                 var integerCheck = value % 1;
-                //if value is a number, if more than 1 item is purchased, if value is a whole number
+                //if value is a number
                 if (!isNaN(value)) {
-                    //if 1 or more items are added, if value is a whole number
+                    //if 1 or more items are added and if value is a whole number
                     if (value > 0 && integerCheck === 0) {
                         return true;
+                    //if value is 0 or a negative number
                     } else if (value <= 0) {
                         return chalk.red("Please enter a valid number.");
+                    //if value is a decimal
                     } else if (integerCheck !== 0) {
                         return (chalk.red("Please enter a whole number."));
-                    } else {
-                        return false;
                     }
+                //if value is a string
                 } else {
                     return (chalk.red("Please enter a valid number."));
                 }

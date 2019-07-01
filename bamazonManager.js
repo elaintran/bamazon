@@ -244,17 +244,8 @@ function newProduct() {
                 return chalk.cyan(value);
             },
             validate: function(value) {
-                //return whole numbers only
-                var integerCheck = value % 1;
-                if (!isNaN(value) && value > 0 && integerCheck === 0) {
-                    return true;
-                } else if (value <= 0) {
-                    return chalk.red("Please enter a valid number.");
-                } else if (value > 2000) {
-                    return chalk.red("Please enter a number less than 2000.");
-                } else if (integerCheck !== 0) {
-                    return chalk.red("Please enter a whole number.");
-                }
+                var input = validateQuantity(value);
+                return input;
             }
         }
     ]).then(function(response) {
@@ -368,7 +359,7 @@ function validateQuantity(value) {
             }
         } else {
             return (chalk.red("The stock limit is 2000. Please try again."));
-        }      
+        }
     } else {
         return (chalk.red("Please enter a valid number."));
     }
