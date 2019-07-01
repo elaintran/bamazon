@@ -91,7 +91,7 @@ function productDisplay(action) {
         //create table using the headers and rows
         table = chalkTable(headers, rows);
         //display table on the console
-        console.log("\n" + table + "\n");
+        console.log(`\n${table}\n`);
         //both product display and add inventory should display table,
         //but table will display last due to async
         //added conditionals to split the function path and prevent from creating the same table
@@ -129,7 +129,7 @@ function lowInventory() {
         }
         //update table
         table = chalkTable(headers, rows);
-        console.log("\n" + table + "\n");
+        console.log(`\n${table}\n`);
         managerPrompt();
     })
 }
@@ -144,8 +144,9 @@ function addInventory() {
                 return chalk.cyan(value);
             },
             validate: function(value) {
-                //if value is a number, if it is an number listed as an id, and if value is a whole number
+                //check if value is a decimal
                 var integerCheck = value % 1;
+                //if value is a number, if it is an number listed as an id, and if value is a whole number
                 if (!isNaN(value) && value > 0 && value <= itemTotal && integerCheck === 0) {
                     return true;
                 } else {
@@ -160,24 +161,8 @@ function addInventory() {
                 return chalk.cyan(value);
             },
             validate: function(value) {
-                var integerCheck = value % 1;
-                //if value is a number
-                if (!isNaN(value)) {
-                    //if 1 or more items are added, if value is a whole number
-                    if (value > 0 && integerCheck === 0) {
-                        return true;
-                    } else if (value <= 0) {
-                        return chalk.red("Please enter a valid number.");
-                    } else if (value > 2000) {
-                        return chalk.red("Please enter a number less than 2000.");
-                    } else if (integerCheck !== 0) {
-                        return (chalk.red("Please enter a whole number."));
-                    } else {
-                        return false;
-                    }
-                } else {
-                    return (chalk.red("Please enter a valid number."));
-                }
+                var input = validateQuantity(value);
+                return input;
             }
         }
     ]).then(function(response) {
@@ -248,37 +233,12 @@ function newProduct() {
                 return chalk.cyan(value);
             },
             validate: function(value) {
-                //if value is a number
-                if (!isNaN(value) && value > 0) {
-                    //convert value into string to find decimal point and use substring
-                    var valueString = value.toString();
-                    var decimalIndex = valueString.indexOf(".");
-                    //if value has a decimal
-                    if (decimalIndex !== -1) {
-                        //get numbers after the trailing decimal point
-                        var pointTwo = valueString.substring(decimalIndex + 1, decimalIndex + 4);
-                        //if value has two decimal points
-                        if (pointTwo.length === 2) {
-                            return true;
-                        } else {
-                            //return false if there is one decimal or more than two decimal points
-                            return chalk.red("Please enter a price with two decimal places.");
-                        }
-                    }
-                    if (value > 2000) {
-                        return chalk.red("Please enter a price less than 2000.");
-                    } else {
-                        //return true if whole number
-                        return true;
-                    }
-                //if value is a string
-                } else {
-                    return chalk.red("Please enter a valid price.");
-                }
+                var input = validatePrice(value);
+                return input;
             }
         }, {
             type: "number",
-            message: "How much would you like to stock?",
+            message: "How much would you like add to the stock?",
             name: "stock",
             transformer: function(value) {
                 return chalk.cyan(value);
@@ -290,6 +250,8 @@ function newProduct() {
                     return true;
                 } else if (value <= 0) {
                     return chalk.red("Please enter a valid number.");
+                } else if (value > 2000) {
+                    return chalk.red("Please enter a number less than 2000.");
                 } else if (integerCheck !== 0) {
                     return chalk.red("Please enter a whole number.");
                 }
@@ -384,6 +346,65 @@ function inputRestrict(value, type) {
         return chalk.red(`Please enter a ${type}.`);
     } else {
         return false;
+    }
+}
+
+function validateQuantity(value) {
+    var integerCheck = value % 1;
+    var valueString = value.toString();
+    //if value is a number
+    if (!isNaN(value)) {
+        //extra security to prevent mysql errors if user inputs an out of range number
+        if (valueString.length <= 7) {
+            //if 1 or more items are added, if value is a whole number
+            if (value > 0 && value < 2001 && integerCheck === 0) {
+                return true;
+            } else if (value <= 0) {
+                return chalk.red("Please enter a valid number.");
+            } else if (value > 2000) {
+                return chalk.red("The stock limit is 2000. Please try again.");
+            } else if (integerCheck !== 0) {
+                return (chalk.red("Please enter a whole number."));
+            }
+        } else {
+            return (chalk.red("The stock limit is 2000. Please try again."));
+        }      
+    } else {
+        return (chalk.red("Please enter a valid number."));
+    }
+}
+
+function validatePrice(value) {
+    //convert value into string to find decimal point and use substring
+    var valueString = value.toString();
+    var decimalIndex = valueString.indexOf(".");
+    //if value is a number
+    if (!isNaN(value) && value > 0) {
+        if (valueString.length <= 7) {
+            //if value has a decimal
+            if (decimalIndex !== -1) {
+                //get numbers after the trailing decimal point
+                var cents = valueString.substring(decimalIndex + 1, decimalIndex + 4);
+                //if value has two decimal points
+                if (cents.length === 2) {
+                    return true;
+                } else {
+                    //return false if there is one decimal or more than two decimal points
+                    return chalk.red("Please enter a price with two decimal places.");
+                }
+            }
+            if (value > 2000) {
+                return chalk.red("The price limit is $2000. Please try again.");
+            } else {
+                //return true if whole number
+                return true;
+            }
+        } else {
+            return (chalk.red("The price limit is $2000. Please try again."));
+        }
+    //if value is a string
+    } else {
+        return chalk.red("Please enter a valid price.");
     }
 }
 

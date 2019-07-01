@@ -31,9 +31,7 @@ var connection = mysql.createConnection({
 
 //connect to mysql
 connection.connect(function(error) {
-    if (error) {
-        console.log(error)
-    }
+    if (error) throw error;
     //connection success message
     // console.log("connected as id " + connection.threadId);
     console.log(chalk.yellow("\n> Welcome to Bamazon: The Furniture Edition!"));
