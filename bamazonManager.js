@@ -5,7 +5,6 @@ var chalk = require("chalk");
 var chalkTable = require("chalk-table");
 require('dotenv').config();
 //global variables
-var itemTotal;
 var stockQuantity;
 //table
 var headers = {
@@ -50,6 +49,7 @@ function managerPrompt() {
             name: "action"
         }
     ]).then(function(response) {
+        //perform action
         switch(response.action) {
             case "View Products for Sale":
                 productDisplay(response.action);
@@ -178,12 +178,14 @@ function checkQuantity(id, quantity) {
         }
     ], function(error, response) {
         if (error) throw error;
+        //add quantity to total quantity
         var totalStock = response[0].stock_quantity + quantity;
         updateProduct(id, quantity, totalStock, response[0].product_name);
     })
 }
 
 function updateProduct(id, quantity, totalQuantity, product) {
+    //use id to update quantity
     connection.query("UPDATE products SET ? WHERE ?", [
         {
             stock_quantity: totalQuantity
@@ -192,6 +194,7 @@ function updateProduct(id, quantity, totalQuantity, product) {
         }
     ], function(error, response) {
         if (error) throw error;
+        //success message
         console.log(chalk`{green > ${quantity} item(s) have been added to ${product}!}
 {yellow > ${product} now has a total of ${totalQuantity} item(s).\n}`);
         managerPrompt();
@@ -263,12 +266,44 @@ function checkProduct(product, department, price, stock) {
         }
     ], function(error, response) {
         if (error) throw error;
+        //if new product does not exist
         if (response.length === 0) {
+            //check if department already exists
+            checkDepartment(department);
+            //add product to product table on mysql
             addProduct(product, department, price, stock);
         } else {
             console.log(chalk.red(`> ${product} has already been added. Please try again.\n`));
             newProduct();
         }
+    })
+}
+
+function checkDepartment(department) {
+    connection.query("SELECT * FROM departments WHERE ?", [
+        {
+            department_name: department
+        }
+    ], function(error, response) {
+        if (error) throw error;
+        //if department does not exist
+        if (response.length === 0) {
+            //generate a dummy overhead cost from 10,000 to 100,000
+            var overhead = +Math.floor(Math.random() * 11) + 1 + "0000"
+            addDepartment(department, overhead);
+        }
+    })
+}
+
+//list new department in the mysql department table
+function addDepartment(department, overhead) {
+    connection.query("INSERT INTO departments SET ?", [
+        {
+            department_name: department,
+            over_head_costs: overhead
+        }
+    ], function(error, response) {
+        if (error) throw error;
     })
 }
 
@@ -398,6 +433,3 @@ function validatePrice(value) {
         return chalk.red("Please enter a valid price.");
     }
 }
-
-//when user adds an product in a department not listed,
-//overheadcost = Math.floor(Math.random() * 11) + 1 + "0000"
