@@ -6,11 +6,11 @@ USE bamazon;
 -- Bamazon Products Table
 CREATE TABLE products (
 	item_id INTEGER AUTO_INCREMENT NOT NULL,
-    product_name VARCHAR(30) NOT NULL,
-    department_name VARCHAR(30) NULL,
-    price DECIMAL(10, 2) NOT NULL,
-    stock_quantity INTEGER(10) NOT NULL,
-    product_sales DECIMAL(10, 2) NULL,
+    product_name VARCHAR(50) NOT NULL,
+    department_name VARCHAR(50) NULL,
+    price DECIMAL(50, 2) NOT NULL,
+    stock_quantity INTEGER(50) NOT NULL,
+    product_sales DECIMAL(50, 2) NULL,
     PRIMARY KEY (item_id)
 );
 
@@ -35,8 +35,8 @@ SELECT * FROM products;
 -- Departments Table
 CREATE TABLE departments (
 	department_id INTEGER AUTO_INCREMENT NOT NULL,
-    department_name VARCHAR(30) NOT NULL,
-    over_head_costs DECIMAL(10, 2) NOT NULL,
+    department_name VARCHAR(50) NOT NULL,
+    over_head_costs DECIMAL(50, 2) NOT NULL,
     PRIMARY KEY (department_id)
 );
 
