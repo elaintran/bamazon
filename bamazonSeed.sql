@@ -52,8 +52,7 @@ SELECT * FROM departments;
 
 -- Joining Products and Department Tables
 SELECT department_id, departments.department_name, over_head_costs,
-SUM(product_sales) AS product_sales,
-product_sales - over_head_costs AS total_profit
+SUM(product_sales) AS product_sales
 FROM departments
 INNER JOIN products ON products.department_name = departments.department_name
 GROUP BY department_name;
