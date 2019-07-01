@@ -7,7 +7,7 @@ npm install
 ```
 
 ## Usage
-Create an `.env` file in the root directory and add your MYSQL password.
+Create an `.env` file in the root directory and add your MySQL password.
 ```
 DB_PASSWORD=password
 ```
@@ -23,6 +23,6 @@ node bamazonSupervisor.js
 
 ## Technologies Used
 * [MySQL](https://www.npmjs.com/package/mysql)
-* [Inquirer] (https://www.npmjs.com/package/inquirer)
-* [Chalk] (https://www.npmjs.com/package/chalk)
-* [Chalk-Table] (https://www.npmjs.com/package/chalk-table)
+* [Inquirer](https://www.npmjs.com/package/inquirer)
+* [Chalk](https://www.npmjs.com/package/chalk)
+* [Chalk-Table](https://www.npmjs.com/package/chalk-table)
