@@ -289,6 +289,7 @@ function checkDepartment(department) {
         //if department does not exist
         if (response.length === 0) {
             //generate a dummy overhead cost from 10,000 to 100,000
+            //so that value is not null when displayed on the supervisor view
             var overhead = +Math.floor(Math.random() * 11) + 1 + "0000"
             addDepartment(department, overhead);
         }
@@ -324,13 +325,14 @@ function addProduct(product, department, price, stock) {
 }
 
 function tableDisplay(product) {
-    //change stock number color to red, yellow, or green according to
-    //whether the items have ran out, are low, or are high in quantity
     var stock = product.stock;
+    //red text if out of stock
     if (stock === 0) {
         stockQuantity = chalk.red(stock);
+    //yellow text if low stock
     } else if (stock >= 1 && stock < 6) {
         stockQuantity = chalk.yellow(stock);
+    //green if high in quantity
     } else {
         stockQuantity = chalk.green(stock);
     }
@@ -363,11 +365,13 @@ function capitalize(value) {
 }
 
 function inputRestrict(value, type) {
-    //if value is not a number and value is not an empty string
+    //if value is string and not empty
     if (isNaN(value) && value !== "") {
         return true;
+    //if value is number
     } else if (!isNaN(value)) {
         return chalk.red("Please use words only.");
+    //if value is empty
     } else if (value === "") {
         return chalk.red(`Please enter a ${type}.`);
     } else {
@@ -376,19 +380,24 @@ function inputRestrict(value, type) {
 }
 
 function validateQuantity(value) {
+    //check if value is a decimal
     var integerCheck = value % 1;
+    //convert value to string to find the length
     var valueString = value.toString();
     //if value is a number
     if (!isNaN(value)) {
         //extra security to prevent mysql errors if user inputs an out of range number
         if (valueString.length <= 7) {
-            //if 1 or more items are added, if value is a whole number
+            //if items added is between 1 and 2000, if value is a whole number
             if (value > 0 && value < 2001 && integerCheck === 0) {
                 return true;
+            //if value is 0 or a negative number
             } else if (value <= 0) {
                 return chalk.red("Please enter a valid number.");
+            //if user enters a value more than what is accepted
             } else if (value > 2000) {
                 return chalk.red("The stock limit is 2000. Please try again.");
+            //if value is a decimal
             } else if (integerCheck !== 0) {
                 return (chalk.red("Please enter a whole number."));
             }
@@ -404,25 +413,27 @@ function validatePrice(value) {
     //convert value into string to find decimal point and use substring
     var valueString = value.toString();
     var decimalIndex = valueString.indexOf(".");
-    //if value is a number
+    //if value is a number and is one or more
     if (!isNaN(value) && value > 0) {
-        if (valueString.length <= 7) {
+        //security measure to prevent out of range answers
+        if (valueString.length <= 9) {
             //if value has a decimal
             if (decimalIndex !== -1) {
-                //get numbers after the trailing decimal point
+                //get cent value
                 var cents = valueString.substring(decimalIndex + 1, decimalIndex + 4);
                 //if value has two decimal points
                 if (cents.length === 2) {
                     return true;
+                //return false if there is one decimal or more than two decimal points
                 } else {
-                    //return false if there is one decimal or more than two decimal points
                     return chalk.red("Please enter a price with two decimal places.");
                 }
             }
+            //limit value to $2000
             if (value > 2000) {
                 return chalk.red("The price limit is $2000. Please try again.");
+            //return true if whole number less than $2001
             } else {
-                //return true if whole number
                 return true;
             }
         } else {
