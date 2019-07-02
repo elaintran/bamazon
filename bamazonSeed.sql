@@ -16,18 +16,18 @@ CREATE TABLE products (
 
 INSERT INTO products (product_name, department_name, price, stock_quantity)
 VALUES
-("Shower Basket", "Bathroom", 6, 24),
-("Soap Dispenser", "Bathroom", 7, 18),
-("Towel Rack", "Bathroom", 30, 10),
-("Duvet Covers", "Bedroom", 40, 7),
-("Nightstand", "Bedroom", 70, 0),
-("Shelf Unit", "Bedroom", 220, 5),
-("Flatware Tray", "Kitchen", 8, 50),
-("Mini Fridge", "Kitchen", 180, 3),
-("Microwave Oven", "Kitchen", 200, 15),
-("Bookcase", "Office", 40, 10),
-("Desk Lamp", "Office", 20, 30),
-("Storage Box", "Office", 6, 25);
+("Shower Basket", "Bathroom", 6, 150),
+("Soap Dispenser", "Bathroom", 7, 500),
+("Towel Rack", "Bathroom", 30, 90),
+("Duvet Covers", "Bedroom", 40, 50),
+("Nightstand", "Bedroom", 70, 170),
+("Shelf Unit", "Bedroom", 220, 60),
+("Flatware Tray", "Kitchen", 8, 450),
+("Mini Fridge", "Kitchen", 180, 160),
+("Microwave Oven", "Kitchen", 200, 130),
+("Bookcase", "Office", 40, 120),
+("Desk Lamp", "Office", 20, 225),
+("Storage Box", "Office", 6, 340);
 
 -- Display Products
 SELECT * FROM products;

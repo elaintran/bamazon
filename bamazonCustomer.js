@@ -61,7 +61,7 @@ function productDisplay() {
         //create table using the headers and rows
         var table = chalkTable(headers, rows);
         //display table on the console
-        console.log(`${table}\n`);
+        console.log(`${table}`);
         purchasePrompt();
     })
 }
@@ -189,7 +189,7 @@ function updateTable(id, totalStock, totalQuantity, totalPrice, totalSales) {
         if (error) throw error;
         //amountSpent is updated every time the user purchases a product
         console.log(chalk`{green > ${totalQuantity} item(s) were successfully purchased for a total of $${totalPrice}!}
-{yellow > Your total spent is: $${amountSpent}.\n}`);
+{yellow > Your total spent is $${amountSpent}.\n}`);
         continuePurchasePrompt();
     })
 }
